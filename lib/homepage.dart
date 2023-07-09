@@ -32,17 +32,22 @@ class _HomepageState extends State<Homepage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateColor.resolveWith(
-                      (states) => Colors.deepPurple),
+              SizedBox(
+                width: 350,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: '',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: const BorderSide(
+                        color: Colors.deepPurpleAccent,
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: () {
-                  setState(() {
-                    ++button1;
-                  });
-                },
-                child: Text(button1.toString()),
               ),
               ElevatedButton(
                 style: ButtonStyle(
@@ -61,11 +66,9 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.deepPurple,
-        selectedIconTheme: const IconThemeData(color: Colors.amberAccent),
-        unselectedIconTheme: const IconThemeData(color: Colors.white),
-        selectedItemColor: Colors.amberAccent[100],
-        unselectedItemColor: Colors.white,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.black54,
         items: const [
           BottomNavigationBarItem(
             label: 'Calculate',
