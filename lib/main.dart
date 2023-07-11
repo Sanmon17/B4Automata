@@ -16,14 +16,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       // useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      // locale: DevicePreview.locale(context),
+      // theme: ThemeData.light(),
+      // darkTheme: ThemeData.dark(),
+      // builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
-      home: const Homepage(),
+      home: Homepage(),
     );
   }
 }

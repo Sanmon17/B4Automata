@@ -16,52 +16,140 @@ class _HomepageState extends State<Homepage> {
       backgroundColor: Colors.deepPurple[50],
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
-        centerTitle: true,
-        title: const Text(
-          'B4 : FA Simulation',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+        // centerTitle: true,
+        flexibleSpace: Row(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Image.asset(
+                'images/cadtlogo.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(
+              child: Text(
+                'B4 : FA Simulation',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      body: Center(
-        child: SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 350,
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: '',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(
-                        color: Colors.deepPurpleAccent,
+      body: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.87,
+                  padding: const EdgeInsets.all(32),
+                  margin: const EdgeInsets.symmetric(vertical: 30),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        child: Image.asset(
+                          'images/automata.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Enter Informations!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Amount of States',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Amount of States',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Amount of States',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Amount of States',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateColor.resolveWith(
+                              (states) => Colors.amber),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            ++button1;
+                          });
+                        },
+                        child: Text('Amount pressed: $button1'),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateColor.resolveWith((states) => Colors.amber),
-                ),
-                onPressed: () {
-                  setState(() {
-                    ++button1;
-                  });
-                },
-                child: Text(button1.toString()),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
