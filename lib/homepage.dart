@@ -19,21 +19,33 @@ class _HomepageState extends State<Homepage> {
         // centerTitle: true,
         flexibleSpace: Row(
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.7,
-              child: Image.asset(
-                'images/cadtlogo.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(
-              child: Text(
-                'B4 : FA Simulation',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+            Container(
+              padding: const EdgeInsets.only(left: 22.0),
+              child: Center(
+                child: Image.asset(
+                  'images/cadtwhiteNoBg.png',
+                  width: MediaQuery.of(context).size.width * 0.17,
+                  height: MediaQuery.of(context).size.height * 0.04,
                 ),
               ),
             ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: const Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  'B4 : FA Simulation',
+                  // textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            // const Spacer(),
           ],
         ),
       ),
