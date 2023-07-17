@@ -8,10 +8,182 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  int button1 = 0, bottomButton = 0;
+  int button1 = 0, bottomButton = 0, currentStep = 1;
+  int? stateAmount = 1, keyAmount = 1;
 
   @override
   Widget build(BuildContext context) {
+    Widget? buttonRow;
+
+    if (currentStep == 1) {
+      buttonRow = ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateColor.resolveWith(
+            (states) => Colors.amber,
+          ),
+        ),
+        onPressed: () {
+          setState(() {
+            ++currentStep;
+          });
+        },
+        child: const Text('Next'),
+      );
+    } else {
+      buttonRow = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Visibility(
+            visible: currentStep > 1,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.amber,
+                ),
+              ),
+              onPressed: () {
+                setState(() {
+                  --currentStep;
+                });
+              },
+              child: const Text('Back'),
+            ),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateColor.resolveWith(
+                (states) => Colors.amber,
+              ),
+            ),
+            onPressed: () {
+              setState(() {
+                ++currentStep;
+              });
+            },
+            child: const Text('Next'),
+          ),
+        ],
+      );
+    }
+
+    List<Widget> renderStep1() {
+      return [
+        const SizedBox(height: 20),
+        const Text('Choose amount of State:'),
+        DropdownButton<int>(
+          value: stateAmount,
+          icon: const Icon(Icons.arrow_downward),
+          elevation: 16,
+          isExpanded: true,
+          style: const TextStyle(color: Colors.deepPurple),
+          underline: Container(
+            height: 2,
+            color: Colors.deepPurpleAccent,
+          ),
+          onChanged: (int? newValue) {
+            setState(() {
+              stateAmount = newValue;
+            });
+          },
+          items: List<DropdownMenuItem<int>>.generate(10, (index) {
+            final value = index + 1;
+            return DropdownMenuItem<int>(
+              value: value,
+              child: Text(value.toString()),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 15),
+        const Text('Choose amount of Key:'),
+        DropdownButton<int>(
+            value: keyAmount,
+            icon: const Icon(Icons.arrow_downward),
+            elevation: 16,
+            isExpanded: true,
+            style: const TextStyle(color: Colors.deepPurple),
+            underline: Container(
+              height: 2,
+              color: Colors.deepPurpleAccent,
+            ),
+            onChanged: (int? newValue) {
+              setState(() {
+                keyAmount = newValue;
+              });
+            },
+            items: List<DropdownMenuItem<int>>.generate(10, (index) {
+              final value = index + 1;
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString()),
+              );
+            }).toList()),
+      ];
+    }
+
+    List<String> stateFieldValues = List.filled(stateAmount!, '');
+    List<Widget> stateFieldList = List.generate(
+      stateAmount!,
+      (index) => [
+        const SizedBox(height: 15),
+        TextField(
+          decoration: InputDecoration(
+            hintText: 'State Value ${index + 1}',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(
+                color: Colors.deepPurpleAccent,
+              ),
+            ),
+          ),
+          onChanged: (value) {
+            setState(() {
+              stateFieldValues[index] = value;
+            });
+          },
+        ),
+      ],
+    ).expand((widgets) => widgets).toList();
+
+    List<String> keyFieldValues = List.filled(keyAmount!, '');
+    List<Widget> keyFieldList = List.generate(
+        keyAmount!,
+        (index) => [
+              const SizedBox(height: 15),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Key Value ${index + 1}',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(
+                      color: Colors.deepPurpleAccent,
+                    ),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    keyFieldValues[index] = value;
+                  });
+                },
+              ),
+            ]).expand((widgets) => widgets).toList();
+
+    List<Widget> renderStep2() {
+      return [
+        Column(
+          children: stateFieldList,
+        ),
+        Column(
+          children: keyFieldList,
+        ),
+      ];
+    }
+
     return Scaffold(
       backgroundColor: Colors.deepPurple[50],
       appBar: AppBar(
@@ -84,79 +256,15 @@ class _HomepageState extends State<Homepage> {
                           color: Colors.deepPurple,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Amount of States',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
-                              color: Colors.deepPurpleAccent,
-                            ),
-                          ),
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (currentStep == 1) ...renderStep1(),
+                          if (currentStep == 2) ...renderStep2(),
+                          const SizedBox(height: 15),
+                        ],
                       ),
-                      const SizedBox(height: 15),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Amount of States',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
-                              color: Colors.deepPurpleAccent,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Amount of States',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
-                              color: Colors.deepPurpleAccent,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Amount of States',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
-                              color: Colors.deepPurpleAccent,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateColor.resolveWith(
-                              (states) => Colors.amber),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            ++button1;
-                          });
-                        },
-                        child: Text('Amount pressed: $button1'),
-                      ),
+                      buttonRow,
                     ],
                   ),
                 ),
