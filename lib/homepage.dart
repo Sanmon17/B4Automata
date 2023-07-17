@@ -8,8 +8,9 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  int button1 = 0, bottomButton = 0, currentStep = 1;
+  int bottomButton = 0, currentStep = 1;
   int? stateAmount = 1, keyAmount = 1;
+  late String initialState, finalState, currentState;
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +31,28 @@ class _HomepageState extends State<Homepage> {
         child: const Text('Next'),
       );
     } else {
-      buttonRow = Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Visibility(
-            visible: currentStep > 1,
-            child: ElevatedButton(
+      buttonRow = Padding(
+        padding: const EdgeInsets.only(top: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Visibility(
+              visible: currentStep > 1,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.amber,
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    --currentStep;
+                  });
+                },
+                child: const Text('Back'),
+              ),
+            ),
+            ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateColor.resolveWith(
                   (states) => Colors.amber,
@@ -43,32 +60,18 @@ class _HomepageState extends State<Homepage> {
               ),
               onPressed: () {
                 setState(() {
-                  --currentStep;
+                  ++currentStep;
                 });
               },
-              child: const Text('Back'),
+              child: const Text('Next'),
             ),
-          ),
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateColor.resolveWith(
-                (states) => Colors.amber,
-              ),
-            ),
-            onPressed: () {
-              setState(() {
-                ++currentStep;
-              });
-            },
-            child: const Text('Next'),
-          ),
-        ],
+          ],
+        ),
       );
     }
 
     List<Widget> renderStep1() {
       return [
-        const SizedBox(height: 20),
         const Text('Choose amount of State:'),
         DropdownButton<int>(
           value: stateAmount,
@@ -96,27 +99,28 @@ class _HomepageState extends State<Homepage> {
         const SizedBox(height: 15),
         const Text('Choose amount of Key:'),
         DropdownButton<int>(
-            value: keyAmount,
-            icon: const Icon(Icons.arrow_downward),
-            elevation: 16,
-            isExpanded: true,
-            style: const TextStyle(color: Colors.deepPurple),
-            underline: Container(
-              height: 2,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (int? newValue) {
-              setState(() {
-                keyAmount = newValue;
-              });
-            },
-            items: List<DropdownMenuItem<int>>.generate(10, (index) {
-              final value = index + 1;
-              return DropdownMenuItem<int>(
-                value: value,
-                child: Text(value.toString()),
-              );
-            }).toList()),
+          value: keyAmount,
+          icon: const Icon(Icons.arrow_downward),
+          elevation: 16,
+          isExpanded: true,
+          style: const TextStyle(color: Colors.deepPurple),
+          underline: Container(
+            height: 2,
+            color: Colors.deepPurpleAccent,
+          ),
+          onChanged: (int? newValue) {
+            setState(() {
+              keyAmount = newValue;
+            });
+          },
+          items: List<DropdownMenuItem<int>>.generate(10, (index) {
+            final value = index + 1;
+            return DropdownMenuItem<int>(
+              value: value,
+              child: Text(value.toString()),
+            );
+          }).toList(),
+        ),
       ];
     }
 
@@ -124,7 +128,6 @@ class _HomepageState extends State<Homepage> {
     List<Widget> stateFieldList = List.generate(
       stateAmount!,
       (index) => [
-        const SizedBox(height: 15),
         TextField(
           decoration: InputDecoration(
             hintText: 'State Value ${index + 1}',
@@ -144,6 +147,7 @@ class _HomepageState extends State<Homepage> {
             });
           },
         ),
+        const SizedBox(height: 15),
       ],
     ).expand((widgets) => widgets).toList();
 
@@ -179,7 +183,13 @@ class _HomepageState extends State<Homepage> {
           children: stateFieldList,
         ),
         Column(
-          children: keyFieldList,
+          children: [
+            const Divider(
+              color: Colors.deepPurple,
+              thickness: 2.5,
+            ),
+            ...keyFieldList
+          ],
         ),
       ];
     }
@@ -256,6 +266,7 @@ class _HomepageState extends State<Homepage> {
                           color: Colors.deepPurple,
                         ),
                       ),
+                      const SizedBox(height: 20),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
