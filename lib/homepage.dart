@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+  const Homepage({Key? key}) : super(key: key);
 
   @override
   State<Homepage> createState() => _HomepageState();
@@ -10,14 +10,17 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   int bottomButton = 0, currentStep = 1;
   int? stateAmount = 1, keyAmount = 1;
-  late String initialState, finalState, currentState;
+  bool? epsilon = false;
+  String? initialState, finalState, currentState;
 
   @override
   Widget build(BuildContext context) {
     Widget? buttonRow;
+    List<String> stateFieldValues = List.filled(stateAmount!, '');
+    List<String> keyFieldValues = List.filled(keyAmount!, '');
 
     if (currentStep == 1) {
-      buttonRow = ElevatedButton(
+      buttonRow = FilledButton(
         style: ButtonStyle(
           backgroundColor: MaterialStateColor.resolveWith(
             (states) => Colors.amber,
@@ -28,7 +31,15 @@ class _HomepageState extends State<Homepage> {
             ++currentStep;
           });
         },
-        child: const Text('Next'),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(7),
+              child: Text('Next'),
+            ),
+          ],
+        ),
       );
     } else {
       buttonRow = Padding(
@@ -38,7 +49,7 @@ class _HomepageState extends State<Homepage> {
           children: [
             Visibility(
               visible: currentStep > 1,
-              child: ElevatedButton(
+              child: FilledButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateColor.resolveWith(
                     (states) => Colors.amber,
@@ -49,10 +60,17 @@ class _HomepageState extends State<Homepage> {
                     --currentStep;
                   });
                 },
-                child: const Text('Back'),
+                child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(7),
+                        child: Text('Back'),
+                      ),
+                    ]),
               ),
             ),
-            ElevatedButton(
+            FilledButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateColor.resolveWith(
                   (states) => Colors.amber,
@@ -63,7 +81,14 @@ class _HomepageState extends State<Homepage> {
                   ++currentStep;
                 });
               },
-              child: const Text('Next'),
+              child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(7),
+                      child: Text('Next'),
+                    ),
+                  ]),
             ),
           ],
         ),
@@ -124,7 +149,6 @@ class _HomepageState extends State<Homepage> {
       ];
     }
 
-    List<String> stateFieldValues = List.filled(stateAmount!, '');
     List<Widget> stateFieldList = List.generate(
       stateAmount!,
       (index) => [
@@ -144,6 +168,7 @@ class _HomepageState extends State<Homepage> {
           onChanged: (value) {
             setState(() {
               stateFieldValues[index] = value;
+              print(stateFieldValues);
             });
           },
         ),
@@ -151,7 +176,13 @@ class _HomepageState extends State<Homepage> {
       ],
     ).expand((widgets) => widgets).toList();
 
-    List<String> keyFieldValues = List.filled(keyAmount!, '');
+    List<DropdownMenuItem<String>> dropdownItems = stateFieldValues
+    .map((value) => DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        ))
+    .toList();
+
     List<Widget> keyFieldList = List.generate(
         keyAmount!,
         (index) => [
@@ -191,6 +222,73 @@ class _HomepageState extends State<Homepage> {
             ...keyFieldList
           ],
         ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Text('Include Epsilon?'),
+                DropdownButton<bool>(
+                  value: epsilon,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      epsilon = newValue;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem(
+                      value: true,
+                      child: Text('Yes'),
+                    ),
+                    DropdownMenuItem(
+                      value: false,
+                      child: Text('No'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+          ],
+        ),
+      ];
+    }
+
+    List<Widget> renderStep3() {
+      return [
+        Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              const Text('Choose Start State:'),
+              DropdownButton<String>(
+                value: initialState,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    initialState = newValue;
+                  });
+                },
+                items: dropdownItems,
+              )
+            ],
+          ),
+        ]),
+        const SizedBox(height: 15),
       ];
     }
 
@@ -272,6 +370,7 @@ class _HomepageState extends State<Homepage> {
                         children: [
                           if (currentStep == 1) ...renderStep1(),
                           if (currentStep == 2) ...renderStep2(),
+                          if (currentStep == 3) ...renderStep3(),
                           const SizedBox(height: 15),
                         ],
                       ),
