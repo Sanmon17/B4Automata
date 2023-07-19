@@ -12,12 +12,14 @@ class _HomepageState extends State<Homepage> {
   int? stateAmount = 1, keyAmount = 1;
   bool? epsilon = false;
   String? initialState, finalState, currentState;
+  List<String> stateFieldValues = [];
+  List<String> keyFieldValues = [];
 
   @override
   Widget build(BuildContext context) {
     Widget? buttonRow;
-    List<String> stateFieldValues = List.filled(stateAmount!, '');
-    List<String> keyFieldValues = List.filled(keyAmount!, '');
+    // List<String> stateFieldValues = List.filled(stateAmount!, '');
+    // List<String> keyFieldValues = List.filled(keyAmount!, '');
 
     if (currentStep == 1) {
       buttonRow = FilledButton(
@@ -96,6 +98,8 @@ class _HomepageState extends State<Homepage> {
     }
 
     List<Widget> renderStep1() {
+      stateFieldValues = [];
+      keyFieldValues = [];
       return [
         const Text('Choose amount of State:'),
         DropdownButton<int>(
@@ -150,46 +154,11 @@ class _HomepageState extends State<Homepage> {
     }
 
     List<Widget> stateFieldList = List.generate(
-      stateAmount!,
-      (index) => [
-        TextField(
-          decoration: InputDecoration(
-            hintText: 'State Value ${index + 1}',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                color: Colors.deepPurpleAccent,
-              ),
-            ),
-          ),
-          onChanged: (value) {
-            setState(() {
-              stateFieldValues[index] = value;
-              print(stateFieldValues);
-            });
-          },
-        ),
-        const SizedBox(height: 15),
-      ],
-    ).expand((widgets) => widgets).toList();
-
-    List<DropdownMenuItem<String>> dropdownItems = stateFieldValues
-    .map((value) => DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        ))
-    .toList();
-
-    List<Widget> keyFieldList = List.generate(
-        keyAmount!,
+        stateAmount!,
         (index) => [
-              const SizedBox(height: 15),
               TextField(
                 decoration: InputDecoration(
-                  hintText: 'Key Value ${index + 1}',
+                  hintText: 'State Value ${index + 1}',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -202,26 +171,69 @@ class _HomepageState extends State<Homepage> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    keyFieldValues[index] = value;
+                    if (!stateFieldValues.contains(value)) {
+                      if (index >= stateFieldValues.length) {
+                        stateFieldValues.add(value);
+                      } else {
+                        stateFieldValues[index] = value;
+                      }
+                      print(stateFieldValues);
+                    } else {
+                      // stateFieldValues[index] = '';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please insert a unique state value!"),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   });
                 },
               ),
+              const SizedBox(height: 15),
+            ]).expand((widgets) => widgets).toList();
+
+    List<Widget> keyFieldList = List.generate(
+        keyAmount!,
+        (index) => [
+              const SizedBox(height: 15),
+              TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Key Value ${index + 1}',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: const BorderSide(
+                        color: Colors.deepPurpleAccent,
+                      ),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      if (!keyFieldValues.contains(value)) {
+                        if (index >= keyFieldValues.length) {
+                          keyFieldValues.add(value);
+                        } else {
+                          keyFieldValues[index] = value;
+                        }
+                        print(keyFieldValues);
+                      } else {
+                        // keyFieldValues[index] = '';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please insert a unique key value!"),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    });
+                  }),
             ]).expand((widgets) => widgets).toList();
 
     List<Widget> renderStep2() {
       return [
-        Column(
-          children: stateFieldList,
-        ),
-        Column(
-          children: [
-            const Divider(
-              color: Colors.deepPurple,
-              thickness: 2.5,
-            ),
-            ...keyFieldList
-          ],
-        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -256,7 +268,90 @@ class _HomepageState extends State<Homepage> {
                 ),
               ],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Text('Choose Start State:'),
+                DropdownButton<String>(
+                  value: initialState != null &&
+                          stateFieldValues.contains(initialState)
+                      ? initialState
+                      : null,
+                  // ?? (stateFieldValues.isNotEmpty ? stateFieldValues[0] : null),
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: initialState != null
+                      ? Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        )
+                      : null,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      initialState = newValue;
+                      print(initialState);
+                    });
+                  },
+                  items: stateFieldValues.map<DropdownMenuItem<String>>(
+                    (String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    },
+                  ).toList(),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Text('Choose Final State:'),
+                DropdownButton<String>(
+                  value: finalState != null &&
+                          stateFieldValues.contains(finalState)
+                      ? finalState
+                      : null,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: finalState != null
+                      ? Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        )
+                      : null,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      finalState = newValue;
+                      print(finalState);
+                    });
+                  },
+                  items: stateFieldValues.map<DropdownMenuItem<String>>(
+                    (String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    },
+                  ).toList(),
+                ),
+              ],
+            ),
             const SizedBox(height: 15),
+          ],
+        ),
+        Column(
+          children: stateFieldList,
+        ),
+        Column(
+          children: [
+            const Divider(
+              color: Colors.deepPurple,
+              thickness: 2.5,
+            ),
+            ...keyFieldList
           ],
         ),
       ];
@@ -264,31 +359,10 @@ class _HomepageState extends State<Homepage> {
 
     List<Widget> renderStep3() {
       return [
-        Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const Text('Choose Start State:'),
-              DropdownButton<String>(
-                value: initialState,
-                icon: const Icon(Icons.arrow_downward),
-                elevation: 16,
-                style: const TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 2,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    initialState = newValue;
-                  });
-                },
-                items: dropdownItems,
-              )
-            ],
-          ),
-        ]),
-        const SizedBox(height: 15),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [],
+        ),
       ];
     }
 
