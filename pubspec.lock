@@ -125,6 +125,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  gviz:
+    dependency: "direct main"
+    description:
+      name: gviz
+      sha256: d1b8d4b6cf4df63d5c79485ccd9228ec25d178170e957dc6920c9eb1f767b518
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   intl:
     dependency: transitive
     description:
