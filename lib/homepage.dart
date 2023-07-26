@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
@@ -11,9 +12,9 @@ class _HomepageState extends State<Homepage> {
   int bottomButton = 0, currentStep = 1;
   int? stateAmount = 1, keyAmount = 1;
   bool? epsilon = false;
-  String? initialState, finalState, currentState;
-  List<String> stateFieldValues = [];
-  List<String> keyFieldValues = [];
+  String? initialState, currentState;
+  List<String> finalState = [];
+  List<String> stateFieldValues = [], keyFieldValues = [];
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +101,8 @@ class _HomepageState extends State<Homepage> {
     List<Widget> renderStep1() {
       stateFieldValues = [];
       keyFieldValues = [];
+      finalState = [];
+      initialState = null;
       return [
         const Text('Choose amount of State:'),
         DropdownButton<int>(
@@ -308,38 +311,61 @@ class _HomepageState extends State<Homepage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 const Text('Choose Final State:'),
-                DropdownButton<String>(
-                  value: finalState != null &&
-                          stateFieldValues.contains(finalState)
-                      ? finalState
-                      : null,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: finalState != null
-                      ? Container(
-                          height: 2,
-                          color: Colors.deepPurpleAccent,
-                        )
-                      : null,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      finalState = newValue;
-                      print(finalState);
-                    });
-                  },
-                  items: stateFieldValues.map<DropdownMenuItem<String>>(
-                    (String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
+                Expanded(
+                  child: MultiSelectDialogField<String>(
+                    initialValue: finalState,
+                    items: stateFieldValues
+                        .map((value) => MultiSelectItem(value, value))
+                        .toList(),
+                    listType: MultiSelectListType.CHIP,
+                    onConfirm: (values) {
+                      setState(() {
+                        finalState = values;
+                        print(finalState);
+                      });
                     },
-                  ).toList(),
+                    chipDisplay: MultiSelectChipDisplay(
+                        chipColor: Colors.amber,
+                        // scroll: true,
+                        textStyle: const TextStyle(color: Colors.white),
+                        onTap: (value) {
+                          setState(() {
+                            finalState.remove(value);
+                            print(finalState);
+                          });
+                        }),
+                  ),
+                  // value:
+                  //     finalState != [] && stateFieldValues.contains(finalState)
+                  //         ? finalState.first
+                  //         : null,
+                  // icon: const Icon(Icons.arrow_downward),
+                  // elevation: 16,
+                  // style: const TextStyle(color: Colors.deepPurple),
+                  // underline: finalState != []
+                  //     ? Container(
+                  //         height: 2,
+                  //         color: Colors.deepPurpleAccent,
+                  //       )
+                  //     : null,
+                  // onChanged: (String? newValue) {
+                  //   setState(() {
+                  //     finalState.add(newValue);
+                  //     print(finalState);
+                  //   });
+                  // },
+                  // items: stateFieldValues.map<DropdownMenuItem<String>>(
+                  //   (String value) {
+                  //     return DropdownMenuItem<String>(
+                  //       value: value,
+                  //       child: Text(value),
+                  //     );
+                  //   },
+                  // ).toList(),
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
           ],
         ),
         Column(
@@ -361,7 +387,12 @@ class _HomepageState extends State<Homepage> {
       return [
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [],
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [],
+            )
+          ],
         ),
       ];
     }
