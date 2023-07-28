@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       // locale: DevicePreview.locale(context),
       // theme: ThemeData.light(),
       // darkTheme: ThemeData.dark(),
-      // builder: DevicePreview.appBuilder,
+      builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
       home: Homepage(),
     );

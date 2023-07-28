@@ -99,10 +99,11 @@ class _HomepageState extends State<Homepage> {
     }
 
     List<Widget> renderStep1() {
-      stateFieldValues = [];
+      stateFieldValues = []; //reset values if user come back to step 1
       keyFieldValues = [];
       finalState = [];
       initialState = null;
+
       return [
         const Text('Choose amount of State:'),
         DropdownButton<int>(
@@ -310,10 +311,14 @@ class _HomepageState extends State<Homepage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Text('Choose Final State:'),
                 Expanded(
                   child: MultiSelectDialogField<String>(
                     initialValue: finalState,
+                    buttonText: const Text('Choose Final State:'),
+                    selectedColor: Colors.deepPurple,
+                    selectedItemsTextStyle: const TextStyle(
+                      color: Colors.white,
+                    ),
                     items: stateFieldValues
                         .map((value) => MultiSelectItem(value, value))
                         .toList(),
@@ -335,33 +340,6 @@ class _HomepageState extends State<Homepage> {
                           });
                         }),
                   ),
-                  // value:
-                  //     finalState != [] && stateFieldValues.contains(finalState)
-                  //         ? finalState.first
-                  //         : null,
-                  // icon: const Icon(Icons.arrow_downward),
-                  // elevation: 16,
-                  // style: const TextStyle(color: Colors.deepPurple),
-                  // underline: finalState != []
-                  //     ? Container(
-                  //         height: 2,
-                  //         color: Colors.deepPurpleAccent,
-                  //       )
-                  //     : null,
-                  // onChanged: (String? newValue) {
-                  //   setState(() {
-                  //     finalState.add(newValue);
-                  //     print(finalState);
-                  //   });
-                  // },
-                  // items: stateFieldValues.map<DropdownMenuItem<String>>(
-                  //   (String value) {
-                  //     return DropdownMenuItem<String>(
-                  //       value: value,
-                  //       child: Text(value),
-                  //     );
-                  //   },
-                  // ).toList(),
                 ),
               ],
             ),
