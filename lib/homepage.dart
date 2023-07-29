@@ -10,17 +10,16 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int bottomButton = 0, currentStep = 1;
-  int? stateAmount = 1, keyAmount = 1;
+  int? stateAmount = 1, keyAmount = 1, transitionAmount;
   bool? epsilon = false;
   String? initialState, currentState;
-  List<String> finalState = [];
-  List<String> stateFieldValues = [], keyFieldValues = [];
+  List<Widget> transitionUI = [];
+  List<String> stateFieldValues = [], keyFieldValues = [], finalState = [];
+  Map<String, String> inputMap = {};
 
   @override
   Widget build(BuildContext context) {
     Widget? buttonRow;
-    // List<String> stateFieldValues = List.filled(stateAmount!, '');
-    // List<String> keyFieldValues = List.filled(keyAmount!, '');
 
     if (currentStep == 1) {
       buttonRow = FilledButton(
@@ -335,7 +334,10 @@ class _HomepageState extends State<Homepage> {
                         textStyle: const TextStyle(color: Colors.white),
                         onTap: (value) {
                           setState(() {
-                            finalState.remove(value);
+                            // finalState.remove(value);
+                            finalState = finalState
+                                .where((item) => item != value)
+                                .toList();
                             print(finalState);
                           });
                         }),
@@ -368,10 +370,35 @@ class _HomepageState extends State<Homepage> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [],
+              children: [
+                Text(
+                    "State ${stateFieldValues.isNotEmpty ? stateFieldValues[0] : ""}"),
+                DropdownButton<String>(
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: initialState != null
+                      ? Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        )
+                      : null,
+                  onChanged: (String? newValue) {
+                    setState(() {});
+                  },
+                  items: stateFieldValues.map<DropdownMenuItem<String>>(
+                    (String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    },
+                  ).toList(),
+                ),
+              ],
             )
           ],
-        ),
+        )
       ];
     }
 
@@ -412,60 +439,70 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
       ),
-      body: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.87,
-                  padding: const EdgeInsets.all(32),
-                  margin: const EdgeInsets.symmetric(vertical: 30),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.2,
-                        child: Image.asset(
-                          'images/automata.png',
-                          fit: BoxFit.cover,
+      body: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.87,
+                    padding: const EdgeInsets.all(32),
+                    margin: const EdgeInsets.symmetric(vertical: 30),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          child: Image.asset(
+                            'images/automata.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Enter Informations!',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          color: Colors.deepPurple,
+                        const SizedBox(height: 32),
+                        const Text(
+                          'Enter Informations!',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            color: Colors.deepPurple,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (currentStep == 1) ...renderStep1(),
-                          if (currentStep == 2) ...renderStep2(),
-                          if (currentStep == 3) ...renderStep3(),
-                          const SizedBox(height: 15),
-                        ],
-                      ),
-                      buttonRow,
-                    ],
+                        const SizedBox(height: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (currentStep == 1) ...renderStep1(),
+                            if (currentStep == 2) ...renderStep2(),
+                            if (currentStep == 3) ...renderStep3(),
+                            const SizedBox(height: 15),
+                          ],
+                        ),
+                        buttonRow,
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
+      floatingActionButton: (currentStep == 3)
+          ? FloatingActionButton(
+              backgroundColor: Colors.deepPurple,
+              child: const Icon(Icons.add),
+              onPressed: () => setState(() {}),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.deepPurple,
