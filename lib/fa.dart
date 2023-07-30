@@ -27,6 +27,16 @@ class FA {
 
   FA();
 
+  FA.copy(FA other) {
+    // Copy the values from 'other' to the new instance
+    // e.g., this.property = other.property;
+    F = other.F;
+    Q = other.Q;
+    S = other.S;
+    T = other.T;
+    X = other.X;
+  }
+
   void createDFA() {
     // input set of states
     print('Enter the numbers of states: ');
@@ -242,7 +252,8 @@ class FA {
           // inputMap[symbol] = nextState.join(',');
           inputMap[symbol] = mapState[nextState.toString()]!;
           // print('Input[$currentState][$symbol]: ${inputMap[symbol]}');
-          print('Input[${mapState['$currentState']}][$symbol]: ${inputMap[symbol]}');
+          print(
+              'Input[${mapState['$currentState']}][$symbol]: ${inputMap[symbol]}');
         }
       }
     }

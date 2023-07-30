@@ -25,6 +25,7 @@ class _HomepageState extends State<Homepage>
       fromState = [],
       byKey = [];
   List<List<String>> toState = [];
+  Map<String, String> inputMap = {};
 
   @override
   bool get wantKeepAlive => true;
@@ -210,47 +211,101 @@ class _HomepageState extends State<Homepage>
               const SizedBox(height: 15),
             ]).expand((widgets) => widgets).toList();
 
-    List<Widget> keyFieldList = List.generate(
-        keyAmount!,
-        (index) => [
-              const SizedBox(height: 15),
-              TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Key Value ${index + 1}',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(
-                        color: Colors.deepPurpleAccent,
+    List<Widget> keyFieldList = [];
+    if (epsilon == true) {
+      keyFieldList = List.generate(
+          keyAmount! - 1,
+          (index) => [
+                const SizedBox(height: 15),
+                TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Key Value ${index + 1}',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: const BorderSide(
+                          color: Colors.deepPurpleAccent,
+                        ),
                       ),
                     ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      if (!keyFieldValues.contains(value)) {
-                        if (index >= keyFieldValues.length) {
-                          keyFieldValues.add(value);
+                    onChanged: (value) {
+                      setState(() {
+                        if (!keyFieldValues.contains(value)) {
+                          if (epsilon == true) {
+                            if (index + 1 >= keyFieldValues.length) {
+                              keyFieldValues.add(value);
+                            } else {
+                              keyFieldValues[index + 1] = value;
+                            }
+                          } else {
+                            if (index >= keyFieldValues.length) {
+                              keyFieldValues.add(value);
+                            } else {
+                              keyFieldValues[index] = value;
+                            }
+                          }
+                          print(keyFieldValues);
                         } else {
-                          keyFieldValues[index] = value;
+                          // keyFieldValues[index] = '';
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text("Please insert a unique key value!"),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
                         }
-                        print(keyFieldValues);
-                      } else {
-                        // keyFieldValues[index] = '';
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Please insert a unique key value!"),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    });
-                  }),
-            ]).expand((widgets) => widgets).toList();
+                      });
+                    }),
+              ]).expand((widgets) => widgets).toList();
+    } else {
+      keyFieldList = List.generate(
+        keyAmount!,
+        (index) => [
+          const SizedBox(height: 15),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Key Value ${index + 1}',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(
+                  color: Colors.deepPurpleAccent,
+                ),
+              ),
+            ),
+            onChanged: (value) {
+              setState(() {
+                if (!keyFieldValues.contains(value)) {
+                  if (index >= keyFieldValues.length) {
+                    keyFieldValues.add(value);
+                  } else {
+                    keyFieldValues[index] = value;
+                  }
+                  print(keyFieldValues);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Please insert a unique key value!"),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              });
+            },
+          ),
+        ],
+      ).expand((widgets) => widgets).toList();
+    }
 
     List<Widget> renderStep2() {
       toState = [];
+      inputMap.clear();
+      faInstance.T.clear();
       return [
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -270,7 +325,13 @@ class _HomepageState extends State<Homepage>
                   ),
                   onChanged: (bool? newValue) {
                     setState(() {
-                      epsilon = newValue;
+                      epsilon = newValue ??
+                          true; // Update the epsilon variable with the new value
+                      if (epsilon!) {
+                        keyAmount = keyAmount! + 1;
+                        keyFieldValues.add('ε');
+                        print(keyFieldValues);
+                      }
                     });
                   },
                   items: const [
@@ -379,6 +440,8 @@ class _HomepageState extends State<Homepage>
 
     List<Widget> renderStep3() {
       userInput = null;
+      inputMap.clear();
+
       if (toState.length < stateAmount! * keyAmount!) {
         // Fill with empty lists if not enough elements
         toState = List.generate(stateAmount! * keyAmount!, (index) => []);
@@ -386,7 +449,6 @@ class _HomepageState extends State<Homepage>
       // Generate the transitionFieldList directly using nested loops
       List<Widget> transitionFieldList =
           List.generate(stateAmount!, (stateIndex) {
-        Map<String, String> inputMap = {};
         return Column(
           children: List.generate(keyAmount!, (keyIndex) {
             int index = stateIndex * keyAmount! + keyIndex;
@@ -527,155 +589,149 @@ class _HomepageState extends State<Homepage>
               width: 200,
               height: 50,
               child: FilledButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.deepPurple,
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateColor.resolveWith(
+                      (states) => Colors.deepPurple,
+                    ),
                   ),
-                ),
-                child: const Text("Test String"),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => FractionallySizedBox(
-                      heightFactor: 0.5,
-                      alignment: Alignment.center,
-                      child: AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        title: const Text(
-                          "Test String",
-                          style: TextStyle(color: Colors.deepPurple),
-                        ),
-                        content: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                          decoration: InputDecoration(
-                                            hintText: 'Enter a String to Test!',
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              borderSide: const BorderSide(
-                                                color: Colors.deepPurpleAccent,
+                  child: const Text("Test String"),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => FractionallySizedBox(
+                        heightFactor: 0.5,
+                        alignment: Alignment.center,
+                        child: AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          title: const Text(
+                            "Test String",
+                            style: TextStyle(color: Colors.deepPurple),
+                          ),
+                          content: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  'Enter a String to Test!',
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                borderSide: const BorderSide(
+                                                  color:
+                                                      Colors.deepPurpleAccent,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              userInput = value;
-                                            });
-                                          }),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                userInput = value;
+                                              });
+                                            }),
+                                      ),
+                                    ]),
+                                const SizedBox(height: 15),
+                                FilledButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateColor.resolveWith(
+                                      (states) => Colors.deepPurple,
                                     ),
-                                  ]),
-                              const SizedBox(height: 15),
-                              FilledButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateColor.resolveWith(
-                                    (states) => Colors.deepPurple,
                                   ),
-                                ),
-                                onPressed: () {
-                                  if (userInput != null || userInput != "") {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            FractionallySizedBox(
-                                              heightFactor: 0.25,
-                                              alignment: Alignment.center,
-                                              child: AlertDialog(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                ),
-                                                content: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Row(
+                                  onPressed: () {
+                                    if (userInput != null || userInput != "") {
+                                      showDialog(
+                                          context: context,
+                                          builder:
+                                              (context) => FractionallySizedBox(
+                                                    heightFactor: 0.25,
+                                                    alignment: Alignment.center,
+                                                    child: AlertDialog(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      content: Column(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            if (faInstance
-                                                                        .isDFA() ==
-                                                                    true &&
-                                                                faInstance.checkDFA(
-                                                                        userInput!) ==
-                                                                    true)
-                                                              const Text(
-                                                                "STRING ACCEPTED !",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .deepPurple),
-                                                              )
-                                                            else if (faInstance
-                                                                        .isDFA() ==
-                                                                    true &&
-                                                                faInstance.checkDFA(
-                                                                        userInput!) ==
-                                                                    false)
-                                                              const Text(
-                                                                "STRING REJECTED !",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .deepPurple),
-                                                              )
-                                                            else if (faInstance
-                                                                        .isDFA() ==
-                                                                    false &&
-                                                                faInstance.checkNFA(
-                                                                        userInput!) ==
-                                                                    true)
-                                                              const Text(
-                                                                "STRING ACCEPTED !",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .deepPurple),
-                                                              )
-                                                            else if (faInstance
-                                                                        .isDFA() ==
-                                                                    false &&
-                                                                faInstance.checkNFA(
-                                                                        userInput!) ==
-                                                                    false)
-                                                              const Text(
-                                                                "STRING REJECTED !",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .deepPurple),
-                                                              )
-                                                          ])
-                                                    ]),
-                                              ),
-                                            ));
-
-                                    print(faInstance.checkDFA(userInput!));
-                                    print(userInput);
-                                  } else {
-                                    faInstance.checkNFA(userInput!);
-                                    print(faInstance.checkNFA(userInput!));
-                                    print(userInput);
-                                  }
-                                },
-                                child: const Text("Check!"),
-                              )
-                            ]),
+                                                            Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  if (faInstance
+                                                                          .isDFA() &&
+                                                                      faInstance
+                                                                              .checkDFA(userInput!) ==
+                                                                          true)
+                                                                    const Text(
+                                                                      "STRING ACCEPTED (1)!",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.deepPurple),
+                                                                    )
+                                                                  else if (faInstance
+                                                                          .isDFA() &&
+                                                                      faInstance
+                                                                              .checkDFA(userInput!) ==
+                                                                          false)
+                                                                    const Text(
+                                                                      "STRING REJECTED (2)!",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.deepPurple),
+                                                                    )
+                                                                  else if (faInstance
+                                                                          .checkNFA(
+                                                                              userInput!) ==
+                                                                      true)
+                                                                    const Text(
+                                                                      "STRING ACCEPTED !(3)",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.deepPurple),
+                                                                    )
+                                                                  else
+                                                                    const Text(
+                                                                      "STRING REJECTED (4)!",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.deepPurple),
+                                                                    )
+                                                                ])
+                                                          ]),
+                                                    ),
+                                                  ));
+                                      if (faInstance.isDFA() == true) {
+                                        print(faInstance.checkDFA(userInput!));
+                                        print(userInput);
+                                      } else {
+                                        print(faInstance.checkNFA(userInput!));
+                                        print(userInput);
+                                      }
+                                    }
+                                  },
+                                  child: const Text("Check!"),
+                                )
+                              ]),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  }),
             ),
             const SizedBox(height: 10),
             SizedBox(
@@ -689,7 +745,8 @@ class _HomepageState extends State<Homepage>
                 ),
                 child: const Text("Convert NFA to DFA"),
                 onPressed: () {
-                  print("hello");
+                  FA copy = FA.copy(faInstance);
+                  copy.convertToDFA();
                 },
               ),
             ),
