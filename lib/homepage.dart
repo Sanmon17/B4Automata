@@ -15,8 +15,8 @@ class _HomepageState extends State<Homepage>
     with AutomaticKeepAliveClientMixin {
   FA faInstance = FA();
   int bottomButton = 0, currentStep = 1;
-  int? stateAmount = 1, keyAmount = 1, transitionAmount;
-  bool? epsilon = false;
+  int? stateAmount = 1, keyAmount = 1;
+  bool? epsilon = false, epsilonCheck;
   String? initialState, userInput;
   List<Widget> transitionFieldList = [];
   List<String> stateFieldValues = [],
@@ -328,8 +328,15 @@ class _HomepageState extends State<Homepage>
                       epsilon = newValue ??
                           true; // Update the epsilon variable with the new value
                       if (epsilon!) {
+                        epsilonCheck = true;
                         keyAmount = keyAmount! + 1;
                         keyFieldValues.add('ε');
+                        print(keyFieldValues);
+                      }
+                      if (epsilon! == false && epsilonCheck == true) {
+                        epsilonCheck == false;
+                        keyAmount = keyAmount! - 1;
+                        keyFieldValues.remove('ε');
                         print(keyFieldValues);
                       }
                     });
