@@ -1,31 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'fa.dart';
 
 class Homepage extends StatefulWidget {
-  const Homepage({Key? key}) : super(key: key);
+  final FA faInstance;
+
+  const Homepage({Key? key, required this.faInstance}) : super(key: key);
 
   @override
   State<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage>
+    with AutomaticKeepAliveClientMixin {
+  FA faInstance = FA();
   int bottomButton = 0, currentStep = 1;
   int? stateAmount = 1, keyAmount = 1, transitionAmount;
   bool? epsilon = false;
   String? initialState, currentState;
-  List<Widget> transitionUI = [];
+  List<Widget> transitionFieldList = [];
   List<String> stateFieldValues = [],
       keyFieldValues = [],
       finalState = [],
       fromState = [],
       byKey = [];
   List<List<String>> toState = [];
-  Map<String, String> inputMap = {};
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Widget? buttonRow;
-    // transitionAmount = (stateAmount! * keyAmount!);
+    FA faInstance = widget.faInstance;
 
     if (currentStep == 1) {
       buttonRow = FilledButton(
@@ -241,104 +249,6 @@ class _HomepageState extends State<Homepage> {
                   }),
             ]).expand((widgets) => widgets).toList();
 
-    // fromState = List.generate(transitionAmount!, (index) => "");
-    // byKey = List.generate(transitionAmount!, (index) => "");
-    // toState = List.generate(transitionAmount!, (index) => []);
-
-    // List<Widget> transitionFieldList = List.generate(
-    //     transitionAmount!,
-    //     (index) => [
-    //           Row(
-    //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //             children: [
-    //               const Text("State"),
-    //               DropdownButton<String>(
-    //                 value: fromState[index],
-    //                 icon: const Icon(Icons.arrow_downward),
-    //                 elevation: 16,
-    //                 style: const TextStyle(color: Colors.deepPurple),
-    //                 underline: fromState != []
-    //                     ? Container(
-    //                         height: 2,
-    //                         color: Colors.deepPurpleAccent,
-    //                       )
-    //                     : null,
-    //                 onChanged: (String? newValue) {
-    //                   setState(() {
-    //                     fromState.add(newValue.toString());
-    //                     print(fromState);
-    //                   });
-    //                 },
-    //                 items: stateFieldValues.map<DropdownMenuItem<String>>(
-    //                   (String value) {
-    //                     return DropdownMenuItem<String>(
-    //                       value: value,
-    //                       child: Text(value),
-    //                     );
-    //                   },
-    //                 ).toList(),
-    //               ),
-    //               const Text("transition by"),
-    //               DropdownButton<String>(
-    //                 value: byKey[index],
-    //                 icon: const Icon(Icons.arrow_downward),
-    //                 elevation: 16,
-    //                 style: const TextStyle(color: Colors.deepPurple),
-    //                 underline: byKey != []
-    //                     ? Container(
-    //                         height: 2,
-    //                         color: Colors.deepPurpleAccent,
-    //                       )
-    //                     : null,
-    //                 onChanged: (String? newValue) {
-    //                   setState(() {
-    //                     byKey.add(newValue.toString());
-    //                     print(byKey);
-    //                   });
-    //                 },
-    //                 items: keyFieldValues.map<DropdownMenuItem<String>>(
-    //                   (String value) {
-    //                     return DropdownMenuItem<String>(
-    //                       value: value,
-    //                       child: Text(value),
-    //                     );
-    //                   },
-    //                 ).toList(),
-    //               ),
-    //             ],
-    //           ),
-    //           MultiSelectDialogField<String>(
-    //             // initialValue: stateFieldValues,
-    //             buttonText: const Text('To'),
-    //             selectedColor: Colors.deepPurple,
-    //             selectedItemsTextStyle: const TextStyle(
-    //               color: Colors.white,
-    //             ),
-    //             items: stateFieldValues
-    //                 .map((value) => MultiSelectItem(value, value))
-    //                 .toList(),
-    //             listType: MultiSelectListType.CHIP,
-    //             onConfirm: (values) {
-    //               setState(() {
-    //                 toState.add(values);
-    //                 print(toState);
-    //               });
-    //             },
-    //             chipDisplay: MultiSelectChipDisplay(
-    //                 chipColor: Colors.amber,
-    //                 // scroll: true,
-    //                 textStyle: const TextStyle(color: Colors.white),
-    //                 onTap: (value) {
-    //                   setState(() {
-    //                     // finalState.remove(value);
-    //                     toState =
-    //                         toState.where((item) => item != value).toList();
-    //                     print(toState);
-    //                   });
-    //                 }),
-    //           ),
-    //         ]).expand((widgets) => widgets).toList();
-
     List<Widget> renderStep2() {
       return [
         Column(
@@ -467,10 +377,85 @@ class _HomepageState extends State<Homepage> {
     }
 
     List<Widget> renderStep3() {
+      if (toState.length < stateAmount! * keyAmount!) {
+        // Fill with empty lists if not enough elements
+        toState = List.generate(stateAmount! * keyAmount!, (index) => []);
+      }
+
+      // Generate the transitionFieldList directly using nested loops
+      List<Widget> transitionFieldList =
+          List.generate(stateAmount!, (stateIndex) {
+        Map<String, String> inputMap = {};
+        return Column(
+          children: List.generate(keyAmount!, (keyIndex) {
+            int index = stateIndex * keyAmount! + keyIndex;
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                        "State ${stateFieldValues[stateIndex]} transition by ${keyFieldValues[keyIndex]}")
+                  ],
+                ),
+                MultiSelectDialogField<String>(
+                  buttonText: const Text('To'),
+                  selectedColor: Colors.deepPurple,
+                  selectedItemsTextStyle: const TextStyle(
+                    color: Colors.white,
+                  ),
+                  items: stateFieldValues
+                      .map((value) => MultiSelectItem(value, value))
+                      .toList(),
+                  listType: MultiSelectListType.CHIP,
+                  onConfirm: (values) {
+                    setState(() {
+                      toState[index] = values;
+                      inputMap[keyFieldValues[keyIndex]] = values.toString();
+                      String key = keyFieldValues[keyIndex];
+                      if (faInstance.T
+                          .containsKey(stateFieldValues[stateIndex])) {
+                        // If the state already exists in the map, concatenate the values
+                        faInstance.T[stateFieldValues[stateIndex]]![key] =
+                            (faInstance.T[stateFieldValues[stateIndex]]![key] ??
+                                    '') +
+                                values.join(', ');
+                      } else {
+                        // Otherwise, create a new entry in the map
+                        faInstance.T[stateFieldValues[stateIndex]] = {
+                          key: values.join(',')
+                        };
+                      }
+                      print(toState);
+                      print(faInstance.T);
+                    });
+                  },
+                  chipDisplay: MultiSelectChipDisplay(
+                    chipColor: Colors.amber,
+                    textStyle: const TextStyle(color: Colors.white),
+                    onTap: (value) {
+                      setState(() {
+                        toState[index] = toState[index]
+                            .where((item) => item != value)
+                            .toList();
+                        print(toState);
+                      });
+                    },
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                )
+              ],
+            );
+          }),
+        );
+      });
+
       return [
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          // children: [...transitionFieldList],
+          children: transitionFieldList,
         )
       ];
     }
