@@ -302,11 +302,10 @@ class FA {
     return newPairs;
   }
 
-  void minimizeDFA() {
+  FA minimizeDFA() {
     Set<String> accessibleStates = {};
     Set<String> nonAccess = Set.from(Q);
-    Set<Set<String?>> distinguishablePair = {};
-    Map<Set<String?>, Map<String, Set<String?>>> unMarkedPair = {};
+
     // STEP 1: check for unaccessible state
     for (var key in T.keys) {
       T[key]?.forEach((k, v) {
@@ -317,6 +316,8 @@ class FA {
       nonAccess.remove(state);
     }
     // STEP 2
+    Set<Set<String?>> distinguishablePair = {};
+    Map<Set<String?>, Map<String, Set<String?>>> unMarkedPair = {};
     for (int i = 0; i < accessibleStates.length; i++) {
       for (int j = 0; j <= i; j++) {
         if (i != j) {
@@ -331,7 +332,6 @@ class FA {
           } else {
             unMarkedPair[newPair] = setNewPairs(X, newPair);
           }
-          // END OF FIRST ITERATION
         }
       }
     }
@@ -371,7 +371,7 @@ class FA {
     // STEP 3 : Group the states into the equivalent classes //
     // Variable for new DFA
     Map<String, Set<String?>> newStateSet = {}; // state set
-    Map<String, Map<String, Set<String?>>> newTransition = {};
+    Map<String, Map<String, String>> newTransition = {};
     Set<String> newFinalState = {};
     String newStartState;
     // get a new set of states
@@ -385,9 +385,9 @@ class FA {
       newStateSet["q${newStateSet.keys.length}'"] = temp;
     });
     // get new transition for new dfa
-    print("New State Set: $newStateSet");
+
     newStateSet.forEach((state, value) {
-      Map<String, Set<String?>> temp1 = {};
+      Map<String, String> temp1 = {};
       X.forEach((symbol) {
         Set<String?> temp2 = {};
         value.forEach((initial) {
@@ -407,25 +407,33 @@ class FA {
             );
           });
         }
-        Set<String?> t = {q};
-        temp1[symbol] = t;
+
+        temp1[symbol] = q;
       });
       newTransition[state] = temp1;
     });
-    print("New Transition: $newTransition");
+
     // Start State
     newStartState = newStateSet.keys.firstWhere(
       (state) => newStateSet[state]!.contains(S),
       orElse: () => "",
     );
-    print("Start State: $newStartState");
     // Final State
     newStateSet.forEach((key, value) {
       if (value.contains(F)) {
         newFinalState.add(key);
       }
     });
-    print("Final State: $newFinalState");
+
+    FA newDFA = FA();
+
+    newDFA.X = X;
+    newDFA.Q = newStateSet.keys.toList();
+    newDFA.T = newTransition;
+    newDFA.F = newFinalState.elementAt(0);
+    newDFA.S = newStartState;
+
+    return newDFA;
   }
 
   // Print DFA Table
@@ -439,116 +447,24 @@ class FA {
 }
 
 void main(List<String> arguments) {
-  // FA dfa = FA();
+  FA dfa = FA();
 
-  // // dfa.createDFA();
-  // dfa.Q = ['q0', 'q1', 'q2', 'q3'];
-  // dfa.X = ['a', 'b'];
-  // dfa.S = 'q0';
-  // dfa.F = 'q3';
-  // dfa.T = {
-  //   'q0': {'a': 'q1', 'b': 'q0'},
-  //   'q1': {'a': 'q1', 'b': 'q2'},
-  //   'q2': {'a': 'q3', 'b': 'q2'},
-  //   'q3': {'a': 'q3', 'b': 'q3'}
-  // };
-
-  // if (dfa.checkDFA('abab')) {
-  //   print('accept');
-  // } else {
-  //   print('rejected');
-  // }
-  // print(dfa.isDFA());
-
-  // accept if there are abb
-  FA nfa = FA();
-
-  nfa.Q = ['q0', 'q1', 'q2', 'q3'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q3';
-  nfa.T = {
-    'q0': {'a': 'q0,q1', 'b': 'q0'},
-    'q1': {'a': '', 'b': 'q2'},
-    'q2': {'a': '', 'b': 'q3'},
-    'q3': {'a': 'q3', 'b': 'q3'},
+  // dfa.createDFA();
+  dfa.Q = ['q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7'];
+  dfa.X = ['a', 'b'];
+  dfa.S = 'q0';
+  dfa.F = 'q2';
+  dfa.T = {
+    'q0': {'a': 'q1', 'b': 'q5'},
+    'q1': {'a': 'q6', 'b': 'q2'},
+    'q2': {'a': 'q0', 'b': 'q2'},
+    'q3': {'a': 'q2', 'b': 'q6'},
+    'q4': {'a': 'q7', 'b': 'q5'},
+    'q5': {'a': 'q2', 'b': 'q6'},
+    'q6': {'a': 'q6', 'b': 'q4'},
+    'q7': {'a': 'q6', 'b': 'q2'}
   };
-
-  print('NFA 1');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
-
-  nfa.Q = ['q0', 'q1', 'q2'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q1';
-  nfa.T = {
-    'q0': {'a': '', 'b': 'q1', 'ε': 'q2'},
-    'q1': {'a': 'q1', 'b': 'q1', 'ε': 'q1'},
-    'q2': {'a': 'q1,q2', 'b': 'q2'},
-  };
-
-  print('NFA 2');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
-
-  nfa.Q = ['q0', 'q1', 'q2', 'q3', 'q4'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q4';
-  nfa.T = {
-    'q0': {'a': 'q1', 'b': ''},
-    'q1': {'a': '', 'b': 'q2'},
-    'q2': {'a': 'q2', 'b': 'q2,q3'},
-    'q3': {'a': 'q4', 'b': ''},
-    'q4': {'a': '', 'b': ''}
-  };
-
-  // print(nfa.checkNFA('abbab'));
-  // print(nfa.isDFA());
-  // print(nfa.T);
-
-  print('NFA 3');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
-  // print('Start State: ${nfa.S}');
-  // print('Final State: ${nfa.F}');
-  // print('Transitions: ${nfa.T}');
-
-  // print(nfa.checkDFA('abb'));
-
-  FA nfa2 = FA();
-
-  // accept when none or more {a,b,c}
-  nfa2.Q = ['q0', 'q1', 'q2'];
-  nfa2.X = ['a', 'b', 'c'];
-  nfa2.S = 'q0';
-  nfa2.F = 'q2';
-  nfa2.T = {
-    'q0': {'a': 'q0', 'b': '', 'c': '', 'ε': 'q1'},
-    'q1': {'a': '', 'b': 'q1', 'c': '', 'ε': 'q2'},
-    'q2': {'a': '', 'b': '', 'c': 'q2'},
-  };
-
-  print('NFA 4');
-  // print(nfa2.checkNFA(''));
-  nfa2.convertToDFA();
-  print(nfa2.isDFA());
-
-  // // accept when there are aa or bb
-  nfa2.S = 'q0';
-  nfa2.F = 'q5';
-  nfa2.T = {
-    'q0': {'a': '', 'b': '', 'ε': 'q1,q3'},
-    'q1': {'a': 'q2', 'b': ''},
-    'q2': {'a': 'q2,q5', 'b': 'q2'},
-    'q3': {'a': '', 'b': 'q4'},
-    'q4': {'a': 'q4', 'b': 'q4,q5'},
-    'q5': {'a': '', 'b': ''}
-  };
-
-  print('NFA 5');
-  // print(nfa2.checkNFA('aab'));
-  nfa2.convertToDFA();
-  print(nfa2.isDFA());
+  dfa.printTable();
+  FA newDfa = dfa.minimizeDFA();
+  newDfa.printTable();
 }
