@@ -17,7 +17,7 @@ class _HomepageState extends State<Homepage>
   int bottomButton = 0, currentStep = 1;
   int? stateAmount = 1, keyAmount = 1, transitionAmount;
   bool? epsilon = false;
-  String? initialState, currentState;
+  String? initialState, userInput;
   List<Widget> transitionFieldList = [];
   List<String> stateFieldValues = [],
       keyFieldValues = [],
@@ -250,6 +250,7 @@ class _HomepageState extends State<Homepage>
             ]).expand((widgets) => widgets).toList();
 
     List<Widget> renderStep2() {
+      toState = [];
       return [
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -377,11 +378,11 @@ class _HomepageState extends State<Homepage>
     }
 
     List<Widget> renderStep3() {
+      userInput = null;
       if (toState.length < stateAmount! * keyAmount!) {
         // Fill with empty lists if not enough elements
         toState = List.generate(stateAmount! * keyAmount!, (index) => []);
       }
-
       // Generate the transitionFieldList directly using nested loops
       List<Widget> transitionFieldList =
           List.generate(stateAmount!, (stateIndex) {
@@ -456,6 +457,260 @@ class _HomepageState extends State<Homepage>
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: transitionFieldList,
+        )
+      ];
+    }
+
+    List<Widget> renderStep4() {
+      String fnState = "";
+      fnState = finalState.join(',');
+
+      faInstance.Q = stateFieldValues;
+      faInstance.X = keyFieldValues;
+      faInstance.S = initialState!;
+      faInstance.F = fnState;
+
+      return [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 200,
+              height: 50,
+              child: FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.deepPurple,
+                  ),
+                ),
+                child: const Text("Test NFA or DFA"),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => FractionallySizedBox(
+                            heightFactor: 0.5,
+                            alignment: Alignment.center,
+                            child: AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              title: const Text(
+                                "Test NFA or DFA",
+                                style: TextStyle(color: Colors.deepPurple),
+                              ),
+                              content: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          if (faInstance.isDFA() == true)
+                                            const Text("IT IS DFA",
+                                                style: TextStyle(
+                                                    color: Colors.deepPurple))
+                                          else
+                                            const Text("IT IS NFA",
+                                                style: TextStyle(
+                                                    color: Colors.deepPurple))
+                                        ]),
+                                  ]),
+                            ),
+                          ));
+                  print(faInstance.isDFA());
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              height: 50,
+              child: FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.deepPurple,
+                  ),
+                ),
+                child: const Text("Test String"),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => FractionallySizedBox(
+                      heightFactor: 0.5,
+                      alignment: Alignment.center,
+                      child: AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        title: const Text(
+                          "Test String",
+                          style: TextStyle(color: Colors.deepPurple),
+                        ),
+                        content: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                          decoration: InputDecoration(
+                                            hintText: 'Enter a String to Test!',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              borderSide: const BorderSide(
+                                                color: Colors.deepPurpleAccent,
+                                              ),
+                                            ),
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              userInput = value;
+                                            });
+                                          }),
+                                    ),
+                                  ]),
+                              const SizedBox(height: 15),
+                              FilledButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateColor.resolveWith(
+                                    (states) => Colors.deepPurple,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  if (userInput != null || userInput != "") {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            FractionallySizedBox(
+                                              heightFactor: 0.25,
+                                              alignment: Alignment.center,
+                                              child: AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                content: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            if (faInstance
+                                                                        .isDFA() ==
+                                                                    true &&
+                                                                faInstance.checkDFA(
+                                                                        userInput!) ==
+                                                                    true)
+                                                              const Text(
+                                                                "STRING ACCEPTED !",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .deepPurple),
+                                                              )
+                                                            else if (faInstance
+                                                                        .isDFA() ==
+                                                                    true &&
+                                                                faInstance.checkDFA(
+                                                                        userInput!) ==
+                                                                    false)
+                                                              const Text(
+                                                                "STRING REJECTED !",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .deepPurple),
+                                                              )
+                                                            else if (faInstance
+                                                                        .isDFA() ==
+                                                                    false &&
+                                                                faInstance.checkNFA(
+                                                                        userInput!) ==
+                                                                    true)
+                                                              const Text(
+                                                                "STRING ACCEPTED !",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .deepPurple),
+                                                              )
+                                                            else if (faInstance
+                                                                        .isDFA() ==
+                                                                    false &&
+                                                                faInstance.checkNFA(
+                                                                        userInput!) ==
+                                                                    false)
+                                                              const Text(
+                                                                "STRING REJECTED !",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .deepPurple),
+                                                              )
+                                                          ])
+                                                    ]),
+                                              ),
+                                            ));
+
+                                    print(faInstance.checkDFA(userInput!));
+                                    print(userInput);
+                                  } else {
+                                    faInstance.checkNFA(userInput!);
+                                    print(faInstance.checkNFA(userInput!));
+                                    print(userInput);
+                                  }
+                                },
+                                child: const Text("Check!"),
+                              )
+                            ]),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              height: 50,
+              child: FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.deepPurple,
+                  ),
+                ),
+                child: const Text("Convert NFA to DFA"),
+                onPressed: () {
+                  print("hello");
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              height: 50,
+              child: FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.deepPurple,
+                  ),
+                ),
+                child: const Text("DFA Minimization"),
+                onPressed: () {
+                  print("hello");
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
         )
       ];
     }
@@ -537,9 +792,12 @@ class _HomepageState extends State<Homepage>
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (currentStep == 1) ...renderStep1(),
+                            if (currentStep == 1)
+                              // ...renderStep4(),
+                              ...renderStep1(),
                             if (currentStep == 2) ...renderStep2(),
                             if (currentStep == 3) ...renderStep3(),
+                            if (currentStep == 4) ...renderStep4(),
                             const SizedBox(height: 15),
                           ],
                         ),
