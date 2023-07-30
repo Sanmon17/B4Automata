@@ -49,6 +49,12 @@ class FA {
         inputMap[X[j]] = stdin.readLineSync()!;
       }
       T['q$i'] = inputMap;
+
+      // dfa.T = {
+//   //   'q0': {'a': 'q1', 'b': 'q0'},
+//   //   'q1': {'a': 'q1', 'b': 'q2'},
+//   //   'q2': {'a': 'q3', 'b': 'q2'},
+//   //   'q3': {'a': 'q3', 'b': 'q3'}
     }
   }
 

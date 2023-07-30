@@ -14,12 +14,18 @@ class _HomepageState extends State<Homepage> {
   bool? epsilon = false;
   String? initialState, currentState;
   List<Widget> transitionUI = [];
-  List<String> stateFieldValues = [], keyFieldValues = [], finalState = [];
+  List<String> stateFieldValues = [],
+      keyFieldValues = [],
+      finalState = [],
+      fromState = [],
+      byKey = [];
+  List<List<String>> toState = [];
   Map<String, String> inputMap = {};
 
   @override
   Widget build(BuildContext context) {
     Widget? buttonRow;
+    // transitionAmount = (stateAmount! * keyAmount!);
 
     if (currentStep == 1) {
       buttonRow = FilledButton(
@@ -235,6 +241,104 @@ class _HomepageState extends State<Homepage> {
                   }),
             ]).expand((widgets) => widgets).toList();
 
+    // fromState = List.generate(transitionAmount!, (index) => "");
+    // byKey = List.generate(transitionAmount!, (index) => "");
+    // toState = List.generate(transitionAmount!, (index) => []);
+
+    // List<Widget> transitionFieldList = List.generate(
+    //     transitionAmount!,
+    //     (index) => [
+    //           Row(
+    //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //             children: [
+    //               const Text("State"),
+    //               DropdownButton<String>(
+    //                 value: fromState[index],
+    //                 icon: const Icon(Icons.arrow_downward),
+    //                 elevation: 16,
+    //                 style: const TextStyle(color: Colors.deepPurple),
+    //                 underline: fromState != []
+    //                     ? Container(
+    //                         height: 2,
+    //                         color: Colors.deepPurpleAccent,
+    //                       )
+    //                     : null,
+    //                 onChanged: (String? newValue) {
+    //                   setState(() {
+    //                     fromState.add(newValue.toString());
+    //                     print(fromState);
+    //                   });
+    //                 },
+    //                 items: stateFieldValues.map<DropdownMenuItem<String>>(
+    //                   (String value) {
+    //                     return DropdownMenuItem<String>(
+    //                       value: value,
+    //                       child: Text(value),
+    //                     );
+    //                   },
+    //                 ).toList(),
+    //               ),
+    //               const Text("transition by"),
+    //               DropdownButton<String>(
+    //                 value: byKey[index],
+    //                 icon: const Icon(Icons.arrow_downward),
+    //                 elevation: 16,
+    //                 style: const TextStyle(color: Colors.deepPurple),
+    //                 underline: byKey != []
+    //                     ? Container(
+    //                         height: 2,
+    //                         color: Colors.deepPurpleAccent,
+    //                       )
+    //                     : null,
+    //                 onChanged: (String? newValue) {
+    //                   setState(() {
+    //                     byKey.add(newValue.toString());
+    //                     print(byKey);
+    //                   });
+    //                 },
+    //                 items: keyFieldValues.map<DropdownMenuItem<String>>(
+    //                   (String value) {
+    //                     return DropdownMenuItem<String>(
+    //                       value: value,
+    //                       child: Text(value),
+    //                     );
+    //                   },
+    //                 ).toList(),
+    //               ),
+    //             ],
+    //           ),
+    //           MultiSelectDialogField<String>(
+    //             // initialValue: stateFieldValues,
+    //             buttonText: const Text('To'),
+    //             selectedColor: Colors.deepPurple,
+    //             selectedItemsTextStyle: const TextStyle(
+    //               color: Colors.white,
+    //             ),
+    //             items: stateFieldValues
+    //                 .map((value) => MultiSelectItem(value, value))
+    //                 .toList(),
+    //             listType: MultiSelectListType.CHIP,
+    //             onConfirm: (values) {
+    //               setState(() {
+    //                 toState.add(values);
+    //                 print(toState);
+    //               });
+    //             },
+    //             chipDisplay: MultiSelectChipDisplay(
+    //                 chipColor: Colors.amber,
+    //                 // scroll: true,
+    //                 textStyle: const TextStyle(color: Colors.white),
+    //                 onTap: (value) {
+    //                   setState(() {
+    //                     // finalState.remove(value);
+    //                     toState =
+    //                         toState.where((item) => item != value).toList();
+    //                     print(toState);
+    //                   });
+    //                 }),
+    //           ),
+    //         ]).expand((widgets) => widgets).toList();
+
     List<Widget> renderStep2() {
       return [
         Column(
@@ -280,7 +384,6 @@ class _HomepageState extends State<Homepage> {
                           stateFieldValues.contains(initialState)
                       ? initialState
                       : null,
-                  // ?? (stateFieldValues.isNotEmpty ? stateFieldValues[0] : null),
                   icon: const Icon(Icons.arrow_downward),
                   elevation: 16,
                   style: const TextStyle(color: Colors.deepPurple),
@@ -367,37 +470,7 @@ class _HomepageState extends State<Homepage> {
       return [
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                    "State ${stateFieldValues.isNotEmpty ? stateFieldValues[0] : ""}"),
-                DropdownButton<String>(
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: initialState != null
-                      ? Container(
-                          height: 2,
-                          color: Colors.deepPurpleAccent,
-                        )
-                      : null,
-                  onChanged: (String? newValue) {
-                    setState(() {});
-                  },
-                  items: stateFieldValues.map<DropdownMenuItem<String>>(
-                    (String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    },
-                  ).toList(),
-                ),
-              ],
-            )
-          ],
+          // children: [...transitionFieldList],
         )
       ];
     }
@@ -495,14 +568,6 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
       ),
-      floatingActionButton: (currentStep == 3)
-          ? FloatingActionButton(
-              backgroundColor: Colors.deepPurple,
-              child: const Icon(Icons.add),
-              onPressed: () => setState(() {}),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: Colors.deepPurple,
