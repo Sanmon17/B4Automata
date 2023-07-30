@@ -2,9 +2,9 @@ import 'dart:collection';
 import 'dart:io';
 
 /// TODO:
-/// convert from NFA to DFA
+/// convert from NFA to DFA | send help PLS :(
 /// minimize DFA
-/// store in database
+/// store in database (Maybe)
 
 class FA {
   int numStates = 0, numAlphabets = 0;
@@ -60,12 +60,6 @@ class FA {
         inputMap[X[j]] = stdin.readLineSync()!;
       }
       T['q$i'] = inputMap;
-
-      // dfa.T = {
-//   //   'q0': {'a': 'q1', 'b': 'q0'},
-//   //   'q1': {'a': 'q1', 'b': 'q2'},
-//   //   'q2': {'a': 'q3', 'b': 'q2'},
-//   //   'q3': {'a': 'q3', 'b': 'q3'}
     }
   }
 
@@ -96,10 +90,11 @@ class FA {
       // Check for epsilon transitions
       Set<String> epsilonStates = {};
       for (var state in currentState.toList()) {
-        if (T[state]!.containsKey('ε')) {
-          epsilonStates.addAll(T[state]!['ε']!.split(','));
+        if (T[state]!.containsKey('')) {
+          epsilonStates.addAll(T[state]!['']!.split(','));
         }
       }
+
       currentState.addAll(epsilonStates);
 
       // iterate over current state and create grab new state transitions
@@ -121,8 +116,8 @@ class FA {
       Set<String> epsilonStates = {};
 
       for (var state in tempNextState.toList()) {
-        if (T[state]!.containsKey('ε')) {
-          epsilonStates.addAll(T[state]!['ε']!.split(','));
+        if (T[state]!.containsKey('')) {
+          epsilonStates.addAll(T[state]!['']!.split(','));
         }
       }
 
@@ -152,7 +147,7 @@ class FA {
       }
 
       // check for epsilon transition
-      if (symbols.contains('ε')) {
+      if (symbols.contains('')) {
         return false;
       }
 
@@ -168,112 +163,67 @@ class FA {
   }
 
   void convertToDFA() {
-    // create new transistion table for DFA
     Map<String, Map<String, String>> dfaTransition = {};
 
-    List<Set<String>> dfaStates = [
-      {S}
-    ];
+    Set<String> dfaStates = {S};
 
     Queue<Set<String>> queue = Queue<Set<String>>();
-    queue.addAll(dfaStates);
+    queue.add(dfaStates);
 
-    int newState = 0;
-    Map<String, String> mapState = {'{$S}': 'q$newState'};
-
-    // using BFS(BreadthFirst Search) algorithm
     while (queue.isNotEmpty) {
       Set<String> currentState = queue.removeFirst();
-      // print('CurrentState: $currentState');
+      print('CurrentState: $currentState');
 
       Map<String, String> inputMap = {};
-      // dfaTransition[currentState.join(',')] = inputMap;
-      dfaTransition[mapState[currentState.toString()]!] = inputMap;
+      dfaTransition[currentState.join(',')] = inputMap;
+      // dfaTransition['q$newDFAState'] = inputMap;
 
       for (String symbol in X) {
         Set<String> nextState = {};
 
         for (String state in currentState) {
-          if (state == '') {
-            // continue;
-            nextState.add('');
-          } else {
-            if (T[state]!.containsKey(symbol)) {
-              nextState.addAll(T[state]![symbol]!.split(','));
-            }
-
-            if (nextState.length > 1) {
-              nextState.remove('');
-            }
-
-            if (T[state]!.containsKey('ε')) {
-              // print('State: $state');
-              if (T[state]![symbol] == '') {
-                nextState.remove('');
-                nextState.addAll(getEpsilonClosure({state}));
-              } else {
-                nextState.addAll(getEpsilonClosure({state}));
-              }
-            }
+          if (T[state]!.containsKey(symbol)) {
+            nextState.addAll(T[state]![symbol]!.split(','));
+            // print('[$state, $symbol]: $nextState');
           }
         }
+
+        Set<String> epsilonClosure = getEpsilonClosure(nextState);
+        nextState.addAll(epsilonClosure);
 
         if (nextState.isNotEmpty) {
-          // print('Next State: $nextState');
-          bool isNewState = true;
-          for (Set<String> state in dfaStates) {
-            if (state.length == nextState.length &&
-                state.difference(nextState).isEmpty) {
-              // State already exists, no need to add it
-              isNewState = false;
-              break;
-            }
-          }
+          inputMap[symbol] = nextState.join(',');
+          print('Next State: ${nextState.join(',')}');
+          // print('Input[$dfaStates][$symbol]: $inputMap');
 
-          if (isNewState) {
-            newState++;
-            mapState[nextState.toString()] = 'q$newState';
-            dfaStates.add(nextState);
+          if (!dfaStates.containsAll(nextState)) {
+            dfaStates.addAll(nextState);
+            print('DFA States: $dfaStates');
             queue.add(nextState);
-            // print('Map States: $mapState');
-            // print('Dfa state: $dfaStates');
+            // print('Next State: $queue');
           }
-
-          // inputMap[symbol] = nextState.join(',');
-          inputMap[symbol] = mapState[nextState.toString()]!;
-          // print('Input[$currentState][$symbol]: ${inputMap[symbol]}');
-          print('Input[${mapState['$currentState']}][$symbol]: ${inputMap[symbol]}');
         }
       }
     }
 
-    List<String> newFinalStates = [];
+    // print(dfaTransition);
     T = dfaTransition;
     numStates = dfaStates.length;
-    for (var state in dfaStates) {
-      if (state.contains(F)) {
-        newFinalStates.add(mapState[state.toString()]!);
-      }
-    }
-    F = newFinalStates.join(',');
-    print('Final State: $F');
   }
 
   Set<String> getEpsilonClosure(Set<String> states) {
-    // Set<String> closure = Set.from(states);
-    Set<String> closure = {};
+    Set<String> closure = Set.from(states);
 
     Queue<String> queue = Queue.from(states);
     while (queue.isNotEmpty) {
       String state = queue.removeFirst();
 
-      if (T[state]!.containsKey('ε')) {
-        Set<String> epsilonStates = T[state]!['ε']!.split(',').toSet();
+      if (T[state]!.containsKey('')) {
+        Set<String> epsilonStates = T[state]!['']!.split(',').toSet();
 
         epsilonStates.removeAll(closure);
         closure.addAll(epsilonStates);
         queue.addAll(epsilonStates);
-        // print('Closure: $closure');
       }
     }
 
@@ -312,86 +262,45 @@ void main(List<String> arguments) {
   nfa.F = 'q3';
   nfa.T = {
     'q0': {'a': 'q0,q1', 'b': 'q0'},
-    'q1': {'a': '', 'b': 'q2'},
-    'q2': {'a': '', 'b': 'q3'},
+    'q1': {'b': 'q2'},
+    'q2': {'b': 'q3'},
     'q3': {'a': 'q3', 'b': 'q3'},
   };
 
-  print('NFA 1');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
-
-  nfa.Q = ['q0', 'q1', 'q2'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q1';
-  nfa.T = {
-    'q0': {'a': '', 'b': 'q1', 'ε': 'q2'},
-    'q1': {'a': 'q1', 'b': 'q1', 'ε': 'q1'},
-    'q2': {'a': 'q1,q2', 'b': 'q2'},
-  };
-
-  print('NFA 2');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
-
-  nfa.Q = ['q0', 'q1', 'q2', 'q3', 'q4'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q4';
-  nfa.T = {
-    'q0': {'a': 'q1', 'b': ''},
-    'q1': {'a': '', 'b': 'q2'},
-    'q2': {'a': 'q2', 'b': 'q2,q3'},
-    'q3': {'a': 'q4', 'b': ''},
-    'q4': {'a': '', 'b': ''}
-  };
-
-  // print(nfa.checkNFA('abbab'));
+  // print(nfa.checkNFA('abb'));
   // print(nfa.isDFA());
-  // print(nfa.T);
 
-  print('NFA 3');
   nfa.convertToDFA();
-  print(nfa.isDFA());
-  // print('Start State: ${nfa.S}');
-  // print('Final State: ${nfa.F}');
-  // print('Transitions: ${nfa.T}');
-
   // print(nfa.checkDFA('abb'));
 
-  FA nfa2 = FA();
+  // FA nfa2 = FA();
 
-  // accept when none or more {a,b,c}
-  nfa2.Q = ['q0', 'q1', 'q2'];
-  nfa2.X = ['a', 'b', 'c'];
-  nfa2.S = 'q0';
-  nfa2.F = 'q2';
-  nfa2.T = {
-    'q0': {'a': 'q0', 'b': '', 'c': '', 'ε': 'q1'},
-    'q1': {'a': '', 'b': 'q1', 'c': '', 'ε': 'q2'},
-    'q2': {'a': '', 'b': '', 'c': 'q2'},
-  };
+  // // accept when none or more {a,b,c}
+  // nfa2.Q = ['q0', 'q1', 'q2'];
+  // nfa2.X = ['a', 'b', 'c'];
+  // nfa2.S = 'q0';
+  // nfa2.F = 'q2';
+  // nfa2.T = {
+  //   'q0': {'a': 'q0', '': 'q1'},
+  //   'q1': {'b': 'q1', '': 'q2'},
+  //   'q2': {'c': 'q2'},
+  // };
 
-  print('NFA 4');
   // print(nfa2.checkNFA(''));
-  nfa2.convertToDFA();
-  print(nfa2.isDFA());
+  // print(nfa2.isDFA());
 
   // // accept when there are aa or bb
-  nfa2.S = 'q0';
-  nfa2.F = 'q5';
-  nfa2.T = {
-    'q0': {'a': '', 'b': '', 'ε': 'q1,q3'},
-    'q1': {'a': 'q2', 'b': ''},
-    'q2': {'a': 'q2,q5', 'b': 'q2'},
-    'q3': {'a': '', 'b': 'q4'},
-    'q4': {'a': 'q4', 'b': 'q4,q5'},
-    'q5': {'a': '', 'b': ''}
-  };
+  // nfa2.S = 'q0';
+  // nfa2.F = 'q5';
+  // nfa2.T = {
+  //   'q0': {'': 'q1,q3'},
+  //   'q1': {'a': 'q2'},
+  //   'q2': {'a': 'q2,q5', 'b': 'q2'},
+  //   'q3': {'b': 'q4'},
+  //   'q4': {'a': 'q4', 'b': 'q4,q5'},
+  //   'q5': {}
+  // };
 
-  print('NFA 5');
   // print(nfa2.checkNFA('aab'));
-  nfa2.convertToDFA();
-  print(nfa2.isDFA());
+  // print(nfa2.isDFA());
 }
