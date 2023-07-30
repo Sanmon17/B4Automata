@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:collection/collection.dart';
 
 /// TODO:
 /// convert from NFA to DFA
@@ -236,7 +237,8 @@ class FA {
           // inputMap[symbol] = nextState.join(',');
           inputMap[symbol] = mapState[nextState.toString()]!;
           // print('Input[$currentState][$symbol]: ${inputMap[symbol]}');
-          print('Input[${mapState['$currentState']}][$symbol]: ${inputMap[symbol]}');
+          print(
+              'Input[${mapState['$currentState']}][$symbol]: ${inputMap[symbol]}');
         }
       }
     }
@@ -272,6 +274,167 @@ class FA {
     }
 
     return closure;
+  }
+
+  // Minimize DFA method
+
+  bool isFinalState(String inputs) {
+    return inputs == F;
+  }
+
+  Set<String?> sortSet(Set<String?> set) {
+    List<String?> listFromSet = set.toList();
+    listFromSet.sort();
+    return listFromSet.toSet();
+  }
+
+  Map<String, Set<String?>> setNewPairs(
+      List<String> alphabets, Set<String?> pair) {
+    Map<String, Set<String?>> newPairs = {};
+
+    alphabets.forEach((symbol) {
+      Set<String?> temp = {};
+      pair.forEach((state) {
+        temp.add(T[state]?[symbol]);
+      });
+      newPairs[symbol] = sortSet(temp);
+    });
+    return newPairs;
+  }
+
+  void minimizeDFA() {
+    Set<String> accessibleStates = {};
+    Set<String> nonAccess = Set.from(Q);
+    Set<Set<String?>> distinguishablePair = {};
+    Map<Set<String?>, Map<String, Set<String?>>> unMarkedPair = {};
+    // STEP 1: check for unaccessible state
+    for (var key in T.keys) {
+      T[key]?.forEach((k, v) {
+        accessibleStates.add(v);
+      });
+    }
+    for (var state in accessibleStates) {
+      nonAccess.remove(state);
+    }
+    // STEP 2
+    for (int i = 0; i < accessibleStates.length; i++) {
+      for (int j = 0; j <= i; j++) {
+        if (i != j) {
+          Set<String?> newPair = {
+            accessibleStates.elementAt(j),
+            accessibleStates.elementAt(i)
+          };
+          // First Iteration // Add pair of final and non final state to distinguishable Pair
+          if (isFinalState(accessibleStates.elementAt(j)) !=
+              isFinalState(accessibleStates.elementAt(i))) {
+            distinguishablePair.add(sortSet(newPair));
+          } else {
+            unMarkedPair[newPair] = setNewPairs(X, newPair);
+          }
+          // END OF FIRST ITERATION
+        }
+      }
+    }
+    // print(unMarkedPair);
+    // Second Iteration //
+    Function deepEq = const DeepCollectionEquality().equals;
+    Set<Set<String?>> toBeAdded = {};
+    Set<Set<String?>> equivalentSets = {};
+    bool stillHaveDisPair = true;
+
+    while (stillHaveDisPair) {
+      int startLength = toBeAdded.length;
+      unMarkedPair.forEach((key, transition) {
+        transition.values.forEach((pairOfTransition) {
+          distinguishablePair.forEach((disPair) {
+            if (deepEq(disPair, pairOfTransition)) {
+              toBeAdded.add(key);
+            }
+          });
+        });
+      });
+      distinguishablePair.addAll(toBeAdded);
+      if (startLength == toBeAdded.length) {
+        stillHaveDisPair = false;
+      }
+    }
+    for (var pair in distinguishablePair) {
+      unMarkedPair.remove(pair);
+    }
+    // END SECOND & THIRD ITERATION //
+    unMarkedPair.keys.forEach((pair) {
+      pair.forEach((state) {
+        accessibleStates.remove(state);
+      });
+    });
+
+    // STEP 3 : Group the states into the equivalent classes //
+    // Variable for new DFA
+    Map<String, Set<String?>> newStateSet = {}; // state set
+    Map<String, Map<String, Set<String?>>> newTransition = {};
+    Set<String> newFinalState = {};
+    String newStartState;
+    // get a new set of states
+
+    unMarkedPair.keys.forEach((pair) {
+      newStateSet["q${newStateSet.keys.length}'"] = pair;
+    });
+    sortSet(accessibleStates).forEach((state) {
+      Set<String?> temp = {};
+      temp.add(state);
+      newStateSet["q${newStateSet.keys.length}'"] = temp;
+    });
+    // get new transition for new dfa
+    print("New State Set: $newStateSet");
+    newStateSet.forEach((state, value) {
+      Map<String, Set<String?>> temp1 = {};
+      X.forEach((symbol) {
+        Set<String?> temp2 = {};
+        value.forEach((initial) {
+          String? temp3 = T[initial]?[symbol];
+          temp2.add(temp3);
+        });
+        var q = newStateSet.keys.firstWhere(
+          (k) => deepEq(newStateSet[k], temp2),
+          orElse: () => "",
+        );
+        if (q == "") {
+          value.forEach((initial) {
+            Set<String?> temp3 = {T[initial]?[symbol]};
+            q = newStateSet.keys.firstWhere(
+              (k) => newStateSet[k]!.containsAll(temp3),
+              orElse: () => "",
+            );
+          });
+        }
+        Set<String?> t = {q};
+        temp1[symbol] = t;
+      });
+      newTransition[state] = temp1;
+    });
+    print("New Transition: $newTransition");
+    // Start State
+    newStartState = newStateSet.keys.firstWhere(
+      (state) => newStateSet[state]!.contains(S),
+      orElse: () => "",
+    );
+    print("Start State: $newStartState");
+    // Final State
+    newStateSet.forEach((key, value) {
+      if (value.contains(F)) {
+        newFinalState.add(key);
+      }
+    });
+    print("Final State: $newFinalState");
+  }
+
+  // Print DFA Table
+  void printTable() {
+    print("   | ${X[0]}\t| ${X[1]}");
+    print("------------");
+    T.forEach((key, value) {
+      print("$key | ${value[X[0]]} | ${value[X[1]]}");
+    });
   }
 }
 
