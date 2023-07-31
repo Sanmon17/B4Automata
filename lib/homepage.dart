@@ -841,7 +841,7 @@ class _HomepageState extends State<Homepage>
                                                                         faInstance.checkDFA(userInput!) ==
                                                                             true)
                                                                       const Text(
-                                                                        "STRING ACCEPTED (1)!",
+                                                                        "STRING ACCEPTED !",
                                                                         style: TextStyle(
                                                                             color:
                                                                                 Colors.deepPurple),
@@ -851,7 +851,7 @@ class _HomepageState extends State<Homepage>
                                                                         faInstance.checkDFA(userInput!) ==
                                                                             false)
                                                                       const Text(
-                                                                        "STRING REJECTED (2)!",
+                                                                        "STRING REJECTED !",
                                                                         style: TextStyle(
                                                                             color:
                                                                                 Colors.deepPurple),
@@ -860,14 +860,14 @@ class _HomepageState extends State<Homepage>
                                                                             .checkNFA(userInput!) ==
                                                                         true)
                                                                       const Text(
-                                                                        "STRING ACCEPTED !(3)",
+                                                                        "STRING ACCEPTED !",
                                                                         style: TextStyle(
                                                                             color:
                                                                                 Colors.deepPurple),
                                                                       )
                                                                     else
                                                                       const Text(
-                                                                        "STRING REJECTED (4)!",
+                                                                        "STRING REJECTED !",
                                                                         style: TextStyle(
                                                                             color:
                                                                                 Colors.deepPurple),

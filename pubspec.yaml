@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  hive_flutter:  
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -39,10 +40,13 @@ dependencies:
   multiselect: ^0.1.0
   multi_select_flutter: ^4.1.3
   graphviz2: ^1.0.0
+  hive: ^2.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator:
+  build_runner:  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
