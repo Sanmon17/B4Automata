@@ -353,14 +353,18 @@ void main(List<String> arguments) {
   nfa.S = 'q0';
   nfa.F = 'q1';
   nfa.T = {
-    'q0': {'a': '', 'b': 'q1', 'ε': 'q2'},
+    'q0': {'b': 'q1', 'ε': 'q2'},
     'q1': {'a': 'q1', 'b': 'q1', 'ε': 'q1'},
     'q2': {'a': 'q1,q2', 'b': 'q2'},
   };
 
   print('NFA 2');
   print(nfa.checkNFA('a'));
-  // nfa.convertToDFA();
+  print(nfa.T);
+  nfa.convertToDFA();
+  print(nfa.T);
+  print(nfa.X);
+  print(nfa.F);
   // print(nfa.isDFA());
 
   // nfa.Q = ['q0', 'q1', 'q2', 'q3', 'q4'];

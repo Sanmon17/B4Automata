@@ -537,6 +537,12 @@ class _HomepageState extends State<Homepage>
       faInstance.X = keyFieldValues;
       faInstance.S = initialState!;
       faInstance.F = fnState;
+      faInstance.numAlphabets = keyAmount!;
+      faInstance.numStates = stateAmount!;
+
+      if (faInstance.X.contains('ε')) {
+        faInstance.X.remove('ε');
+      }
 
       return [
         Column(
@@ -717,8 +723,8 @@ class _HomepageState extends State<Homepage>
                                                                       style: TextStyle(
                                                                           color:
                                                                               Colors.deepPurple),
-                                                                    )
-                                                                ])
+                                                                    ),
+                                                                ]),
                                                           ]),
                                                     ),
                                                   ));
@@ -744,17 +750,98 @@ class _HomepageState extends State<Homepage>
               width: 200,
               height: 50,
               child: FilledButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.deepPurple,
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateColor.resolveWith(
+                      (states) => Colors.deepPurple,
+                    ),
                   ),
-                ),
-                child: const Text("Convert NFA to DFA"),
-                onPressed: () {
-                  FA copy = FA.copy(faInstance);
-                  copy.convertToDFA();
-                },
-              ),
+                  child: const Text("Convert NFA to DFA"),
+                  onPressed: () {
+                    FA copy = FA.copy(faInstance);
+                    copy.convertToDFA();
+
+                    List<DataColumn> copyColumn = List.generate(
+                      copy.X.length,
+                      (index) => DataColumn(
+                        label: Expanded(
+                          child: Text(
+                            copy.X[index],
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                      ),
+                    );
+
+                    List<DataRow> copyRow = copy.T.entries
+                        .where((entry) => copy.X.every(
+                            (inputKey) => entry.value.containsKey(inputKey)))
+                        .map((entry) => DataRow(
+                              cells: [
+                                DataCell(Text(entry.key)),
+                                ...copy.X.map((inputKey) => DataCell(
+                                    Text(entry.value[inputKey] ?? ''))),
+                              ],
+                            ))
+                        .toList();
+
+                    showDialog(
+                      context: context,
+                      builder: (context) => FractionallySizedBox(
+                        heightFactor: 0.7,
+                        alignment: Alignment.center,
+                        child: AlertDialog(
+                          title: const Text("New DFA",
+                              style: TextStyle(color: Colors.deepPurple)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          content: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Center(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.deepPurple,
+                                                    width: 2),
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: DataTable(
+                                              columnSpacing: 35,
+                                              columns: <DataColumn>[
+                                                const DataColumn(
+                                                  label: Expanded(
+                                                    child: Text(
+                                                      '',
+                                                      style: TextStyle(
+                                                          fontStyle:
+                                                              FontStyle.italic),
+                                                    ),
+                                                  ),
+                                                ),
+                                                ...copyColumn,
+                                              ],
+                                              rows: copyRow,
+                                            ),
+                                          ),
+                                        )
+                                      ]),
+                                  const SizedBox(height: 20),
+                                  Text("Start State: ${copy.S}"),
+                                  Text("Final State: ${copy.F}"),
+                                ]),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 55),
+                        ),
+                      ),
+                    );
+                  }),
             ),
             const SizedBox(height: 10),
             SizedBox(
