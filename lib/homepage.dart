@@ -16,7 +16,7 @@ class _HomepageState extends State<Homepage>
   FA faInstance = FA();
   int bottomButton = 0, currentStep = 1;
   int? stateAmount = 1, keyAmount = 1;
-  bool? epsilon = false, epsilonCheck;
+  bool? epsilon = false, epsilonCheck = false;
   String? initialState, userInput;
   List<Widget> transitionFieldList = [];
   List<String> stateFieldValues = [],
@@ -212,7 +212,7 @@ class _HomepageState extends State<Homepage>
             ]).expand((widgets) => widgets).toList();
 
     List<Widget> keyFieldList = [];
-    if (epsilon == true) {
+    if (epsilon! && epsilonCheck == true) {
       keyFieldList = List.generate(
           keyAmount! - 1,
           (index) => [
@@ -233,7 +233,7 @@ class _HomepageState extends State<Homepage>
                     onChanged: (value) {
                       setState(() {
                         if (!keyFieldValues.contains(value)) {
-                          if (epsilon == true) {
+                          if (epsilon! && epsilonCheck == true) {
                             if (index + 1 >= keyFieldValues.length) {
                               keyFieldValues.add(value);
                             } else {
@@ -248,7 +248,6 @@ class _HomepageState extends State<Homepage>
                           }
                           print(keyFieldValues);
                         } else {
-                          // keyFieldValues[index] = '';
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content:
@@ -327,14 +326,14 @@ class _HomepageState extends State<Homepage>
                     setState(() {
                       epsilon = newValue ??
                           true; // Update the epsilon variable with the new value
-                      if (epsilon!) {
+                      if (epsilon! == true && epsilonCheck == false) {
                         epsilonCheck = true;
                         keyAmount = keyAmount! + 1;
                         keyFieldValues.add('ε');
                         print(keyFieldValues);
                       }
                       if (epsilon! == false && epsilonCheck == true) {
-                        epsilonCheck == false;
+                        epsilonCheck = false;
                         keyAmount = keyAmount! - 1;
                         keyFieldValues.remove('ε');
                         print(keyFieldValues);
