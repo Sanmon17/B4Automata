@@ -58,14 +58,14 @@ class _HomepageState extends State<Homepage>
           ],
         ),
       );
-    } else {
+    } else if (currentStep < 4 && currentStep > 1) {
       buttonRow = Padding(
         padding: const EdgeInsets.only(top: 15),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Visibility(
-              visible: currentStep > 1,
+              visible: (currentStep < 4 && currentStep > 1),
               child: FilledButton(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateColor.resolveWith(
@@ -104,6 +104,61 @@ class _HomepageState extends State<Homepage>
                     Padding(
                       padding: EdgeInsets.all(7),
                       child: Text('Next'),
+                    ),
+                  ]),
+            ),
+          ],
+        ),
+      );
+    } else if (currentStep == 4) {
+      buttonRow = Padding(
+        padding: const EdgeInsets.only(top: 15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Visibility(
+              visible: (currentStep == 4),
+              child: FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.amber,
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    --currentStep;
+                  });
+                },
+                child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(7),
+                        child: Text('Back'),
+                      ),
+                    ]),
+              ),
+            ),
+            const SizedBox(
+              height: 17,
+            ),
+            FilledButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.amber,
+                ),
+              ),
+              onPressed: () {
+                setState(() {
+                  print("save!");
+                });
+              },
+              child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(7),
+                      child: Text('Save'),
                     ),
                   ]),
             ),
@@ -546,322 +601,489 @@ class _HomepageState extends State<Homepage>
 
       return [
         Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 200,
-              height: 50,
-              child: FilledButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.deepPurple,
-                  ),
-                ),
-                child: const Text("Test NFA or DFA"),
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) => FractionallySizedBox(
-                            heightFactor: 0.5,
-                            alignment: Alignment.center,
-                            child: AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              title: const Text(
-                                "Test NFA or DFA",
-                                style: TextStyle(color: Colors.deepPurple),
-                              ),
-                              content: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          if (faInstance.isDFA() == true)
-                                            const Text("IT IS DFA",
-                                                style: TextStyle(
-                                                    color: Colors.deepPurple))
-                                          else
-                                            const Text("IT IS NFA",
-                                                style: TextStyle(
-                                                    color: Colors.deepPurple))
-                                        ]),
-                                  ]),
-                            ),
-                          ));
-                  print(faInstance.isDFA());
-                },
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              height: 50,
-              child: FilledButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith(
-                      (states) => Colors.deepPurple,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.deepPurple,
+                      ),
                     ),
-                  ),
-                  child: const Text("Test String"),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => FractionallySizedBox(
-                        heightFactor: 0.5,
-                        alignment: Alignment.center,
-                        child: AlertDialog(
+                    child: const Text("View FA"),
+                    onPressed: () {
+                      List<DataColumn> dataColumn = List.generate(
+                        keyAmount!,
+                        (index) => DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              keyFieldValues[index],
+                              style:
+                                  const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                      );
+
+                      List<DataRow> dataRow = faInstance.T.entries
+                          .where((entry) => keyFieldValues.every(
+                              (inputKey) => entry.value.containsKey(inputKey)))
+                          .map((entry) => DataRow(
+                                cells: [
+                                  DataCell(Text(entry.key)),
+                                  ...keyFieldValues.map((inputKey) => DataCell(
+                                      Text(entry.value[inputKey] ?? ''))),
+                                ],
+                              ))
+                          .toList();
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("View FA",
+                              style: TextStyle(color: Colors.deepPurple)),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          title: const Text(
-                            "Test String",
-                            style: TextStyle(color: Colors.deepPurple),
-                          ),
-                          content: Column(
+                              borderRadius: BorderRadius.circular(15)),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText:
-                                                  'Enter a String to Test!',
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                borderSide: const BorderSide(
-                                                  color:
-                                                      Colors.deepPurpleAccent,
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Center(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.deepPurple, width: 2),
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: DataTable(
+                                          columnSpacing: 35,
+                                          columns: <DataColumn>[
+                                            const DataColumn(
+                                              label: Expanded(
+                                                child: Text(
+                                                  '',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic),
                                                 ),
                                               ),
                                             ),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                userInput = value;
-                                              });
-                                            }),
+                                            ...dataColumn,
+                                          ],
+                                          rows: dataRow,
+                                        ),
                                       ),
-                                    ]),
-                                const SizedBox(height: 15),
-                                FilledButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateColor.resolveWith(
-                                      (states) => Colors.deepPurple,
                                     ),
                                   ),
-                                  onPressed: () {
-                                    if (userInput != null || userInput != "") {
-                                      showDialog(
-                                          context: context,
-                                          builder:
-                                              (context) => FractionallySizedBox(
-                                                    heightFactor: 0.25,
-                                                    alignment: Alignment.center,
-                                                    child: AlertDialog(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                      ),
-                                                      content: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (faInstance
-                                                                          .isDFA() &&
-                                                                      faInstance
-                                                                              .checkDFA(userInput!) ==
-                                                                          true)
-                                                                    const Text(
-                                                                      "STRING ACCEPTED (1)!",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.deepPurple),
-                                                                    )
-                                                                  else if (faInstance
-                                                                          .isDFA() &&
-                                                                      faInstance
-                                                                              .checkDFA(userInput!) ==
-                                                                          false)
-                                                                    const Text(
-                                                                      "STRING REJECTED (2)!",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.deepPurple),
-                                                                    )
-                                                                  else if (faInstance
-                                                                          .checkNFA(
-                                                                              userInput!) ==
-                                                                      true)
-                                                                    const Text(
-                                                                      "STRING ACCEPTED !(3)",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.deepPurple),
-                                                                    )
-                                                                  else
-                                                                    const Text(
-                                                                      "STRING REJECTED (4)!",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.deepPurple),
-                                                                    ),
-                                                                ]),
-                                                          ]),
-                                                    ),
-                                                  ));
-                                      if (faInstance.isDFA() == true) {
-                                        print(faInstance.checkDFA(userInput!));
-                                        print(userInput);
-                                      } else {
-                                        print(faInstance.checkNFA(userInput!));
-                                        print(userInput);
-                                      }
-                                    }
-                                  },
-                                  child: const Text("Check!"),
-                                )
-                              ]),
+                                ),
+                                const SizedBox(height: 20),
+                                Text("Start State: $initialState"),
+                                Text("Final State: $finalState"),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    );
-                  }),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              height: 50,
-              child: FilledButton(
+                      );
+                    }),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: FilledButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateColor.resolveWith(
                       (states) => Colors.deepPurple,
                     ),
                   ),
-                  child: const Text("Convert NFA to DFA"),
+                  child: const Text("Test NFA or DFA"),
                   onPressed: () {
-                    FA copy = FA.copy(faInstance);
-                    copy.convertToDFA();
-
-                    List<DataColumn> copyColumn = List.generate(
-                      copy.X.length,
-                      (index) => DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            copy.X[index],
-                            style: const TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                    );
-
-                    List<DataRow> copyRow = copy.T.entries
-                        .where((entry) => copy.X.every(
-                            (inputKey) => entry.value.containsKey(inputKey)))
-                        .map((entry) => DataRow(
-                              cells: [
-                                DataCell(Text(entry.key)),
-                                ...copy.X.map((inputKey) => DataCell(
-                                    Text(entry.value[inputKey] ?? ''))),
-                              ],
-                            ))
-                        .toList();
-
                     showDialog(
-                      context: context,
-                      builder: (context) => FractionallySizedBox(
-                        heightFactor: 0.7,
-                        alignment: Alignment.center,
-                        child: AlertDialog(
-                          title: const Text("New DFA",
-                              style: TextStyle(color: Colors.deepPurple)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          content: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Column(
+                        context: context,
+                        builder: (context) => FractionallySizedBox(
+                              heightFactor: 0.5,
+                              alignment: Alignment.center,
+                              child: AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                title: const Text(
+                                  "Test NFA or DFA",
+                                  style: TextStyle(color: Colors.deepPurple),
+                                ),
+                                content: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            if (faInstance.isDFA() == true)
+                                              const Text("IT IS DFA",
+                                                  style: TextStyle(
+                                                      color: Colors.deepPurple))
+                                            else
+                                              const Text("IT IS NFA",
+                                                  style: TextStyle(
+                                                      color: Colors.deepPurple))
+                                          ]),
+                                    ]),
+                              ),
+                            ));
+                    print(faInstance.isDFA());
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.deepPurple,
+                      ),
+                    ),
+                    child: const Text("Test String"),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => FractionallySizedBox(
+                          heightFactor: 0.5,
+                          alignment: Alignment.center,
+                          child: AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            title: const Text(
+                              "Test String",
+                              style: TextStyle(color: Colors.deepPurple),
+                            ),
+                            content: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Center(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: Colors.deepPurple,
-                                                    width: 2),
-                                                borderRadius:
-                                                    BorderRadius.circular(7)),
-                                            child: DataTable(
-                                              columnSpacing: 35,
-                                              columns: <DataColumn>[
-                                                const DataColumn(
-                                                  label: Expanded(
-                                                    child: Text(
-                                                      '',
-                                                      style: TextStyle(
-                                                          fontStyle:
-                                                              FontStyle.italic),
-                                                    ),
+                                        Expanded(
+                                          child: TextField(
+                                              decoration: InputDecoration(
+                                                hintText:
+                                                    'Enter a String to Test!',
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                ),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  borderSide: const BorderSide(
+                                                    color:
+                                                        Colors.deepPurpleAccent,
                                                   ),
                                                 ),
-                                                ...copyColumn,
-                                              ],
-                                              rows: copyRow,
-                                            ),
-                                          ),
-                                        )
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  userInput = value;
+                                                });
+                                              }),
+                                        ),
                                       ]),
-                                  const SizedBox(height: 20),
-                                  Text("Start State: ${copy.S}"),
-                                  Text("Final State: ${copy.F}"),
+                                  const SizedBox(height: 15),
+                                  FilledButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateColor.resolveWith(
+                                        (states) => Colors.deepPurple,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      if (userInput != null ||
+                                          userInput != "") {
+                                        showDialog(
+                                            context: context,
+                                            builder:
+                                                (context) =>
+                                                    FractionallySizedBox(
+                                                      heightFactor: 0.25,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: AlertDialog(
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(15),
+                                                        ),
+                                                        content: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    if (faInstance
+                                                                            .isDFA() &&
+                                                                        faInstance.checkDFA(userInput!) ==
+                                                                            true)
+                                                                      const Text(
+                                                                        "STRING ACCEPTED (1)!",
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.deepPurple),
+                                                                      )
+                                                                    else if (faInstance
+                                                                            .isDFA() &&
+                                                                        faInstance.checkDFA(userInput!) ==
+                                                                            false)
+                                                                      const Text(
+                                                                        "STRING REJECTED (2)!",
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.deepPurple),
+                                                                      )
+                                                                    else if (faInstance
+                                                                            .checkNFA(userInput!) ==
+                                                                        true)
+                                                                      const Text(
+                                                                        "STRING ACCEPTED !(3)",
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.deepPurple),
+                                                                      )
+                                                                    else
+                                                                      const Text(
+                                                                        "STRING REJECTED (4)!",
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.deepPurple),
+                                                                      ),
+                                                                  ]),
+                                                            ]),
+                                                      ),
+                                                    ));
+                                        if (faInstance.isDFA() == true) {
+                                          print(
+                                              faInstance.checkDFA(userInput!));
+                                          print(userInput);
+                                        } else {
+                                          print(
+                                              faInstance.checkNFA(userInput!));
+                                          print(userInput);
+                                        }
+                                      }
+                                    },
+                                    child: const Text("Check!"),
+                                  )
                                 ]),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 55),
                         ),
-                      ),
-                    );
-                  }),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              height: 50,
-              child: FilledButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateColor.resolveWith(
-                    (states) => Colors.deepPurple,
-                  ),
-                ),
-                child: const Text("DFA Minimization"),
-                onPressed: () {
-                  print("hello");
-                },
+                      );
+                    }),
               ),
-            ),
-            const SizedBox(height: 10),
-          ],
-        )
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.deepPurple,
+                      ),
+                    ),
+                    child: const Text("Convert NFA to DFA"),
+                    onPressed: () {
+                      FA copy = FA.copy(faInstance);
+                      copy.convertToDFA();
+
+                      List<DataColumn> copyColumn = List.generate(
+                        copy.X.length,
+                        (index) => DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              copy.X[index],
+                              style:
+                                  const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                      );
+
+                      List<DataRow> copyRow = copy.T.entries
+                          .where((entry) => copy.X.every(
+                              (inputKey) => entry.value.containsKey(inputKey)))
+                          .map((entry) => DataRow(
+                                cells: [
+                                  DataCell(Text(entry.key)),
+                                  ...copy.X.map((inputKey) => DataCell(
+                                      Text(entry.value[inputKey] ?? ''))),
+                                ],
+                              ))
+                          .toList();
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("New DFA",
+                              style: TextStyle(color: Colors.deepPurple)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Center(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.deepPurple, width: 2),
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: DataTable(
+                                          columnSpacing: 35,
+                                          columns: <DataColumn>[
+                                            const DataColumn(
+                                              label: Expanded(
+                                                child: Text(
+                                                  '',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                ),
+                                              ),
+                                            ),
+                                            ...copyColumn,
+                                          ],
+                                          rows: copyRow,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text("Start State: ${copy.S}"),
+                                Text("Final State: ${copy.F}"),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 200,
+                height: 50,
+                child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.deepPurple,
+                      ),
+                    ),
+                    child: const Text("DFA Minimization"),
+                    onPressed: () {
+                      FA copy1 = FA.copy(faInstance);
+                      copy1 = copy1.minimizeDFA();
+
+                      List<DataColumn> copyColumn = List.generate(
+                        copy1.X.length,
+                        (index) => DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              copy1.X[index],
+                              style:
+                                  const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                      );
+
+                      List<DataRow> copyRow = copy1.T.entries
+                          .where((entry) => copy1.X.every(
+                              (inputKey) => entry.value.containsKey(inputKey)))
+                          .map((entry) => DataRow(
+                                cells: [
+                                  DataCell(Text(entry.key)),
+                                  ...copy1.X.map((inputKey) => DataCell(
+                                      Text(entry.value[inputKey] ?? ''))),
+                                ],
+                              ))
+                          .toList();
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Minimized DFA",
+                              style: TextStyle(color: Colors.deepPurple)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Center(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.deepPurple, width: 2),
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: DataTable(
+                                          columnSpacing: 35,
+                                          columns: <DataColumn>[
+                                            const DataColumn(
+                                              label: Expanded(
+                                                child: Text(
+                                                  '',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                ),
+                                              ),
+                                            ),
+                                            ...copyColumn,
+                                          ],
+                                          rows: copyRow,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text("Start State: ${copy1.S}"),
+                                Text("Final State: ${copy1.F}"),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              )
+            ])
       ];
     }
 
@@ -930,9 +1152,11 @@ class _HomepageState extends State<Homepage>
                           ),
                         ),
                         const SizedBox(height: 32),
-                        const Text(
-                          'Enter Informations!',
-                          style: TextStyle(
+                        Text(
+                          currentStep != 4
+                              ? 'Enter Information!'
+                              : 'Select a Feature!',
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 30,
                             color: Colors.deepPurple,
@@ -942,16 +1166,14 @@ class _HomepageState extends State<Homepage>
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (currentStep == 1)
-                              // ...renderStep4(),
-                              ...renderStep1(),
+                            if (currentStep == 1) ...renderStep1(),
                             if (currentStep == 2) ...renderStep2(),
                             if (currentStep == 3) ...renderStep3(),
                             if (currentStep == 4) ...renderStep4(),
                             const SizedBox(height: 15),
                           ],
                         ),
-                        buttonRow,
+                        buttonRow!,
                       ],
                     ),
                   ),
