@@ -124,19 +124,25 @@ List<Map<String, dynamic>> converter(List<Map<String, dynamic>> datas,
 
 void main() {
   // trasition is:'0' == start state, is:'1' == end state for empty state denote as '' or 'Ø'
-  final datas = [
-    {'is': '0', 'state': 'q0', 'a': '', 'b': 'q1', 'ε': 'q2'},
-    {'is': '1', 'state': 'q1', 'a': 'q1', 'b': 'q1', 'ε': 'q1'},
-    {'is': '', 'state': 'q2', 'a': 'q1, q2', 'b': 'q2', 'ε': ''},
-  ];
+  // final datas = [
+  //   {'is': '0', 'state': 'q0', 'a': '', 'b': 'q1', 'ε': 'q2'},
+  //   {'is': '1', 'state': 'q1', 'a': 'q1', 'b': 'q1', 'ε': 'q1'},
+  //   {'is': '', 'state': 'q2', 'a': 'q1, q2', 'b': 'q2', 'ε': ''},
+  // ];
 
-  // header is the symbol
-  final header = ['a', 'b'];
-  // states
-  final states = ['q0', 'q1', 'q2'];
-  //final states  and start states
-  final startfinal = {'start': 'q0', 'final': 'q1'};
+  // // header is the symbol
+  // final header = ['a', 'b'];
+  // // states
+  // final states = ['q0', 'q1', 'q2'];
+  // //final states  and start states
+  // final startfinal = {'start': 'q0', 'final': 'q1'};
 
-  final result = converter(datas, header, states, startfinal);
-  print(result);
+  // final result = converter(datas, header, states, startfinal);
+  // print(result);
+
+  
+  List<String> test = ['a', 'b', 'c'];
+  String str = '';
+  str = test.join(',');
+  print(str);
 }

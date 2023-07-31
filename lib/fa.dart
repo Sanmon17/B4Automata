@@ -87,7 +87,9 @@ class FA {
     var symbol = inputs.split('').iterator;
     while (symbol.moveNext()) {
       // check if input exist in transition table and set currentState to new state through the input from table
-      if (T[currentState]!.containsKey(symbol.current)) {
+      if (T[currentState]![symbol.current] == '') {
+        return false;
+      } else if (T[currentState]!.containsKey(symbol.current)) {
         currentState = T[currentState]![symbol.current]!;
       }
     }
@@ -103,6 +105,7 @@ class FA {
     while (symbol.moveNext()) {
       Set<String> nextState = {};
 
+      // print('Current State: $currentState');
       // Check for epsilon transitions
       Set<String> epsilonStates = {};
       for (var state in currentState.toList()) {
@@ -110,19 +113,23 @@ class FA {
           epsilonStates.addAll(T[state]!['ε']!.split(','));
         }
       }
-      currentState.addAll(epsilonStates);
+      nextState.addAll(epsilonStates);
 
       // iterate over current state and create grab new state transitions
       for (var state in currentState.toList()) {
         if (T[state]!.containsKey(symbol.current)) {
-          nextState.addAll(T[state]![symbol.current]!.split(','));
+          if (T[state]![symbol.current] == '') {
+            nextState.remove('');
+          } else {
+            nextState.addAll(T[state]![symbol.current]!.split(','));
+          }
         } else {
           nextState = currentState;
         }
       }
 
       currentState = nextState;
-      // print('Current State: $currentState');
+      print('Current State: $currentState');
     }
 
     // check for epsilon transition
@@ -205,7 +212,6 @@ class FA {
 
         for (String state in currentState) {
           if (state == '') {
-            // continue;
             nextState.add('');
           } else {
             if (T[state]!.containsKey(symbol)) {
@@ -258,20 +264,30 @@ class FA {
       }
     }
 
-    List<String> newFinalStates = [];
+    // put new transition as the transition table
     T = dfaTransition;
+
+    // new length for DFA
     numStates = dfaStates.length;
+
+    // add new states
+    List<String> newStates = [];
+    for (var state in mapState.keys) {
+      newStates.add(mapState[state]!);
+    }
+    Q = newStates;
+
+    // add new final states
+    List<String> newFinalStates = [];
     for (var state in dfaStates) {
       if (state.contains(F)) {
         newFinalStates.add(mapState[state.toString()]!);
       }
     }
     F = newFinalStates.join(',');
-    print('Final State: $F');
   }
 
   Set<String> getEpsilonClosure(Set<String> states) {
-    // Set<String> closure = Set.from(states);
     Set<String> closure = {};
 
     Queue<String> queue = Queue.from(states);
@@ -317,20 +333,20 @@ void main(List<String> arguments) {
   // accept if there are abb
   FA nfa = FA();
 
-  nfa.Q = ['q0', 'q1', 'q2', 'q3'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q3';
-  nfa.T = {
-    'q0': {'a': 'q0,q1', 'b': 'q0'},
-    'q1': {'a': '', 'b': 'q2'},
-    'q2': {'a': '', 'b': 'q3'},
-    'q3': {'a': 'q3', 'b': 'q3'},
-  };
+  // nfa.Q = ['q0', 'q1', 'q2', 'q3'];
+  // nfa.X = ['a', 'b'];
+  // nfa.S = 'q0';
+  // nfa.F = 'q3';
+  // nfa.T = {
+  //   'q0': {'a': 'q0,q1', 'b': 'q0'},
+  //   'q1': {'a': '', 'b': 'q2'},
+  //   'q2': {'a': '', 'b': 'q3'},
+  //   'q3': {'a': 'q3', 'b': 'q3'},
+  // };
 
-  print('NFA 1');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
+  // print('NFA 1');
+  // nfa.convertToDFA();
+  // print(nfa.isDFA());
 
   nfa.Q = ['q0', 'q1', 'q2'];
   nfa.X = ['a', 'b'];
@@ -343,66 +359,69 @@ void main(List<String> arguments) {
   };
 
   print('NFA 2');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
+  print(nfa.checkNFA('a'));
+  // nfa.convertToDFA();
+  // print(nfa.isDFA());
 
-  nfa.Q = ['q0', 'q1', 'q2', 'q3', 'q4'];
-  nfa.X = ['a', 'b'];
-  nfa.S = 'q0';
-  nfa.F = 'q4';
-  nfa.T = {
-    'q0': {'a': 'q1', 'b': ''},
-    'q1': {'a': '', 'b': 'q2'},
-    'q2': {'a': 'q2', 'b': 'q2,q3'},
-    'q3': {'a': 'q4', 'b': ''},
-    'q4': {'a': '', 'b': ''}
-  };
+  // nfa.Q = ['q0', 'q1', 'q2', 'q3', 'q4'];
+  // nfa.X = ['a', 'b'];
+  // nfa.S = 'q0';
+  // nfa.F = 'q4';
+  // nfa.T = {
+  //   'q0': {'a': 'q1', 'b': ''},
+  //   'q1': {'a': '', 'b': 'q2'},
+  //   'q2': {'a': 'q2', 'b': 'q2,q3'},
+  //   'q3': {'a': 'q4', 'b': ''},
+  //   'q4': {'a': '', 'b': ''}
+  // };
 
   // print(nfa.checkNFA('abbab'));
+  // nfa.convertToDFA();
+  // print(nfa.F);
   // print(nfa.isDFA());
   // print(nfa.T);
 
-  print('NFA 3');
-  nfa.convertToDFA();
-  print(nfa.isDFA());
+  // print('NFA 3');
+  // nfa.convertToDFA();
+  // print(nfa.isDFA());
   // print('Start State: ${nfa.S}');
   // print('Final State: ${nfa.F}');
   // print('Transitions: ${nfa.T}');
 
   // print(nfa.checkDFA('abb'));
 
-  FA nfa2 = FA();
+  // FA nfa2 = FA();
 
   // accept when none or more {a,b,c}
-  nfa2.Q = ['q0', 'q1', 'q2'];
-  nfa2.X = ['a', 'b', 'c'];
-  nfa2.S = 'q0';
-  nfa2.F = 'q2';
-  nfa2.T = {
-    'q0': {'a': 'q0', 'b': '', 'c': '', 'ε': 'q1'},
-    'q1': {'a': '', 'b': 'q1', 'c': '', 'ε': 'q2'},
-    'q2': {'a': '', 'b': '', 'c': 'q2'},
-  };
+  // nfa2.Q = ['q0', 'q1', 'q2'];
+  // nfa2.X = ['a', 'b', 'c'];
+  // nfa2.S = 'q0';
+  // nfa2.F = 'q2';
+  // nfa2.T = {
+  //   'q0': {'a': 'q0', 'b': '', 'c': '', 'ε': 'q1'},
+  //   'q1': {'a': '', 'b': 'q1', 'c': '', 'ε': 'q2'},
+  //   'q2': {'a': '', 'b': '', 'c': 'q2'},
+  // };
 
-  print('NFA 4');
+  // print('NFA 4');
   // print(nfa2.checkNFA(''));
-  nfa2.convertToDFA();
-  print(nfa2.isDFA());
+  // nfa2.convertToDFA();
+  // print(nfa2.isDFA());
 
   // // accept when there are aa or bb
-  nfa2.S = 'q0';
-  nfa2.F = 'q5';
-  nfa2.T = {
-    'q0': {'a': '', 'b': '', 'ε': 'q1,q3'},
-    'q1': {'a': 'q2', 'b': ''},
-    'q2': {'a': 'q2,q5', 'b': 'q2'},
-    'q3': {'a': '', 'b': 'q4'},
-    'q4': {'a': 'q4', 'b': 'q4,q5'},
-    'q5': {'a': '', 'b': ''}
-  };
+  // nfa2.S = 'q0';
+  // nfa2.F = 'q5';
+  // nfa2.T = {
+  //   'q0': {'a': '', 'b': '', 'ε': 'q1,q3'},
+  //   'q1': {'a': 'q2', 'b': ''},
+  //   'q2': {'a': 'q2,q5', 'b': 'q2'},
+  //   'q3': {'a': '', 'b': 'q4'},
+  //   'q4': {'a': 'q4', 'b': 'q4,q5'},
+  //   'q5': {'a': '', 'b': ''}
+  // };
 
-  print('NFA 5');
+  // print('NFA 5');
   // print(nfa2.checkNFA('aab'));
-  nfa2.convertToDFA();
-  print(nfa2.isDFA());
+  // nfa2.convertToDFA();
+  // print(nfa2.isDFA());
 }
